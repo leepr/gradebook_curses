@@ -14,6 +14,7 @@ class MainModel
     LoggerModel.instance.log("Starting to load storage")
     begin
       @properties = PropertyModel.instance
+      p "outside: #{@properties.data_uri}"
       #@storage.load
     rescue Exception => error
       LoggerModel.instance.log("#{self.class} - Unable to load data using: #{error}.")
