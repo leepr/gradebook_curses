@@ -1,5 +1,6 @@
 require "./app/models/logger_model"
 require "./app/models/property_model"
+require "./app/models/storage_model"
 
 require 'singleton'
 
@@ -16,7 +17,18 @@ class MainModel
       @properties = PropertyModel.instance
 
       # load data
-      StorageModel.new @properties.data_uri
+      @storage = StorageModel.new @properties
+      p "Loaded data:#{@storage.data}"
+
+      # TODO - create class to store data
+      data = {
+        "classes" => "Patrick"
+      }
+
+      @storage.save data
+      @storage.load
+      p "After saving data:#{@storage.data}"
+      
     rescue Exception => error
       LoggerModel.instance.log("#{self.class} - Unable to load data using: #{error}.")
     end
