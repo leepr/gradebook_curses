@@ -10,12 +10,13 @@ class MainModel
   end
 
   def init_load 
-    #@storage = storage
     LoggerModel.instance.log("Starting to load storage")
     begin
+      # get properties
       @properties = PropertyModel.instance
-      p "outside: #{@properties.data_uri}"
-      #@storage.load
+
+      # load data
+      StorageModel.new @properties.data_uri
     rescue Exception => error
       LoggerModel.instance.log("#{self.class} - Unable to load data using: #{error}.")
     end
