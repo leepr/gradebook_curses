@@ -1,14 +1,18 @@
+require 'singleton'
 require 'json'
 require './app/models/logger_model'
 
 class StorageModel
+  include Singleton
   attr_reader :data
-  def initialize properties
+
+  def init properties
     @properties = properties
+    load_data 
   end
 
   def load
-    load_data @properties
+    load_data
   end
 
   def save data
@@ -16,10 +20,10 @@ class StorageModel
   end
 
   private
-  def load_data properties
+  def load_data 
     LoggerModel.instance.log "#{self.class} - Initiating load data"
-    if File.exist? properties.data_uri
-      file = File.read(properties.data_uri)
+    if File.exist? @properties.data_uri
+      file = File.read(@properties.data_uri)
       @data = JSON.parse(file)
     else
       # empty data

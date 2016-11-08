@@ -7,7 +7,7 @@ class CoursesModel
     @courses = []
   end
 
-  def init_data courses_data
+  def init courses_data
     init_courses courses_data
   end
 
