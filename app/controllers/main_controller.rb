@@ -1,5 +1,5 @@
 require 'singleton'
-require './app/controllers/menu_controller'
+require './app/controllers/views/main_view_controller'
 require './app/models/main_model'
 
 class MainController
@@ -9,13 +9,7 @@ class MainController
   def initialize
     MainModel.instance.init_load 
     
-    @window = Window.new(Curses.lines, Curses.cols, 0, 0)
-    @window.box('|', '-')
-    @window.refresh
-    draw_menu_window
-  end
-
-  def draw_menu_window
-    @menu_controller = MenuController.new @window
+    @main_view = MainViewController.instance
+    @main_view.draw
   end
 end
