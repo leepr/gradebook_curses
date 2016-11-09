@@ -3,6 +3,8 @@ require 'singleton'
 
 class CoursesModel
   include Singleton
+  attr_reader :courses
+
   def initialize
     @courses = []
   end
