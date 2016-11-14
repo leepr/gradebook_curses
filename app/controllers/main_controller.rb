@@ -4,6 +4,7 @@ require "./app/models/logger_model"
 require "./app/models/property_model"
 require "./app/models/storage_model"
 require "./app/models/courses_model"
+require 'byebug'
 
 
 class MainController
