@@ -25,7 +25,7 @@ class MainViewController
     @menu_controller = MenuController.new @window
   end
 
-  def update(event, msg)
-    p "message received by context:#{msg} event:#{event}"
+  def update(event)
+    p "message received by context:#{event}"
   end
 end

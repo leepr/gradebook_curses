@@ -28,9 +28,8 @@ class ViewControllerCourses
       when 'j'
         @position += 1
       when ':'
-        p "colon\n\n"
-        event_object = {:msg => "hello"}
-        send_notification(EVENT_COLON_PRESSED, event_object)
+        event_object = {:event => EVENT_COLON_PRESSED}
+        send_notification(EVENT_COLON_PRESSED)
       end
       @position = (@courses.size) if @position < 0
       @position = 0 if @position > (@courses.size) 
