@@ -17,7 +17,6 @@ class CoursesModel
     def init_courses courses_data
       courses_data.each do |course|
         @courses << course
-        p "inserting course:#{course}"
       end
     end
 end

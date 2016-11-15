@@ -1,7 +1,11 @@
+require 'observer'
 require 'singleton'
+require './app/helpers/view_controllers_helper'
 require './app/models/courses_model'
 
 class ViewControllerCourses
+  include ViewControllersHelper
+  include Observable
   include Singleton
 
   WINDOW_LEFT_MARGIN = 4
@@ -23,19 +27,15 @@ class ViewControllerCourses
         @position -= 1
       when 'j'
         @position += 1
+      when ':'
+        p "colon\n\n"
+        event_object = {:msg => "hello"}
+        send_notification(EVENT_COLON_PRESSED, event_object)
       end
       @position = (@courses.size) if @position < 0
       @position = 0 if @position > (@courses.size) 
       draw_menu 
     end
-
-=begin
-    if @context.context == ContextModel::CONTEXT_COURSES
-      draw_menu_window
-    else
-      LoggerModel.instance.log("does this work?")
-    end
-=end
     @window.refresh
   end
 
@@ -48,8 +48,8 @@ class ViewControllerCourses
 
     # draw menu
     @window.setpos(@courses.size+1, WINDOW_LEFT_MARGIN)
-    @window.attrset((@courses.size)==@position ? A_STANDOUT : A_NORMAL)
-    @window.addstr "r: rename course"
+    @window.attrset(@courses.size==@position ? A_STANDOUT : A_NORMAL)
+    @window.addstr("(c): create course; (d): delete course; (r): rename course; (x) exit")
 
     @window.setpos(10, WINDOW_LEFT_MARGIN)
     @window.addstr "pos:#{@position}"

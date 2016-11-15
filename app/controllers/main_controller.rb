@@ -15,7 +15,7 @@ class MainController
     load_data
     
     @main_view = MainViewController.instance
-    @main_view.draw
+    @main_view.init
   end
 
   private
