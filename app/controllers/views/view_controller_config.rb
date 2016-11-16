@@ -1,23 +1,21 @@
 require 'observer'
 require 'singleton'
 require './app/helpers/view_controllers_helper'
-require './app/models/courses_model'
 
-class ViewControllerCourses
+class ViewControllerConfig
   include ViewControllersHelper
   include Observable
   include Singleton
 
-  WINDOW_LEFT_MARGIN = 4
+  WINDOW_LEFT_MARGIN = 2
 
   def initialize
     @position = 0
-    @courses = CoursesModel.instance.courses
   end
 
   def draw
-    @window = Window.new(Curses.lines, Curses.cols, 0, 0)
-    @window.box('|', '-')
+    @window = Window.new(3, Curses.cols, 0, 0)
+    @window.box('x', 'o')
     @window.refresh
 
     draw_menu 
@@ -29,7 +27,7 @@ class ViewControllerCourses
         @position += 1
       when ':'
         event_object = {:event => EVENT_COLON_PRESSED}
-        send_notification(event_object)
+        send_notification(EVENT_COLON_PRESSED)
       end
       @position = (@courses.size) if @position < 0
       @position = 0 if @position > (@courses.size) 
@@ -39,6 +37,7 @@ class ViewControllerCourses
   end
 
   def draw_menu
+=begin
     @courses.each_with_index do |course, i|
       @window.setpos(i+1, WINDOW_LEFT_MARGIN)
       @window.attrset(i==@position ? A_STANDOUT : A_NORMAL)
@@ -52,5 +51,6 @@ class ViewControllerCourses
 
     @window.setpos(10, WINDOW_LEFT_MARGIN)
     @window.addstr "pos:#{@position}"
+=end
   end
 end
