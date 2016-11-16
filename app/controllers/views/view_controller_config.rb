@@ -1,39 +1,46 @@
 require 'observer'
 require 'singleton'
 require './app/helpers/view_controllers_helper'
+require './app/helpers/input_helper'
 
 class ViewControllerConfig
+  include InputHelper
   include ViewControllersHelper
   include Observable
   include Singleton
 
   WINDOW_LEFT_MARGIN = 2
+  WINDOW_HEIGHT = 1
 
   def initialize
     @position = 0
   end
 
   def draw
-    @window = Window.new(3, Curses.cols, 0, 0)
-    @window.box('x', 'o')
+    @window = Window.new(WINDOW_HEIGHT, Curses.cols, Curses.lines-WINDOW_HEIGHT, 0)
+    @window.attrset(A_NORMAL)
+    @window.addstr(":")
     @window.refresh
 
+    setup_one_line_input
+
     draw_menu 
-    while ch = @window.getch
-      case ch
-      when 'k'
-        @position -= 1
-      when 'j'
-        @position += 1
-      when ':'
+    while(input = @window.getch)
+      case input
+      when 'q'
+        @window.close_screen
         event_object = {:event => EVENT_COLON_PRESSED}
         send_notification(EVENT_COLON_PRESSED)
+      when 13
+        p "enter pressed"
+      else
+        c_input ||= input
       end
-      @position = (@courses.size) if @position < 0
-      @position = 0 if @position > (@courses.size) 
-      draw_menu 
     end
+    @window.addstr(cinput)
     @window.refresh
+
+    cleanup_one_line_input
   end
 
   def draw_menu
