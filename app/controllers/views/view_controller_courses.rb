@@ -1,10 +1,10 @@
 require 'observer'
 require 'singleton'
-require './app/helpers/view_controllers_helper'
+require './app/helpers/event_helper'
 require './app/models/courses_model'
 
 class ViewControllerCourses
-  include ViewControllersHelper
+  include EventHelper
   include Observable
   include Singleton
 
@@ -13,6 +13,10 @@ class ViewControllerCourses
   def initialize
     @position = 0
     @courses = CoursesModel.instance.courses
+  end
+
+  def close
+    @window.close
   end
 
   def draw
@@ -30,12 +34,12 @@ class ViewControllerCourses
       when ':'
         event_object = {:event => EVENT_COLON_PRESSED}
         send_notification(event_object)
+        break
       end
       @position = (@courses.size) if @position < 0
       @position = 0 if @position > (@courses.size) 
       draw_menu 
     end
-    @window.refresh
   end
 
   def draw_menu
