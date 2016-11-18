@@ -7,8 +7,8 @@ class ViewControllerCourses
   include EventHelper
   include Observable
   include Singleton
-
   WINDOW_LEFT_MARGIN = 4
+  WINDOW_BOTTOM_MARGIN = 1
 
   def initialize
     @position = 0
@@ -20,8 +20,7 @@ class ViewControllerCourses
   end
 
   def draw
-    @window = Window.new(Curses.lines, Curses.cols, 0, 0)
-    @window.box('|', '-')
+    @window = Window.new(Curses.lines - WINDOW_BOTTOM_MARGIN, Curses.cols, 0, 0)
     @window.refresh
 
     draw_menu 

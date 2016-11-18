@@ -4,9 +4,12 @@ require 'singleton'
 class ContextModel
   include Singleton
 
+  attr_accessor :message
+
   CONTEXT_CONFIG = :config
   CONTEXT_COURSES = :courses
   CONTEXT_STUDENTS = :students
+  CONTEXT_ERROR = :error
 
   def initialize
     @context = []
@@ -24,5 +27,6 @@ class ContextModel
   def context
     @context.last
   end
+
 
 end
