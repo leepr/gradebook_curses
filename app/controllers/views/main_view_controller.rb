@@ -4,6 +4,7 @@ require './app/controllers/views/menu_controller'
 require './app/controllers/views/view_controller_courses'
 require './app/controllers/views/view_controller_config'
 require './app/controllers/views/view_controller_error'
+require './app/helpers/input_helper'
 require './app/helpers/event_helper'
 require './app/models/context_model'
 require './app/models/courses_model'
@@ -11,12 +12,14 @@ require './app/models/courses_model'
 class MainViewController
   include Singleton
   include EventHelper
+  include InputHelper
 
   def initialize
     @context = ContextModel.instance
   end
 
   def init
+    setup_input
     draw
   end
 
@@ -36,6 +39,9 @@ class MainViewController
       # remove main window
       @context.message=event_obj[:message]
       @context.add_context ContextModel::CONTEXT_ERROR
+      draw
+    elsif event_obj[:event]==EVENT_ESCAPE
+      @context.remove_context 
       draw
     elsif event_obj[:event]==EVENT_FINISHED_DISPLAYING_STATUS
       @context.remove_context 

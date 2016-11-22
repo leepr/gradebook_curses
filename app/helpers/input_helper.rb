@@ -1,13 +1,19 @@
 module InputHelper
-  def setup_one_line_input
-    Curses.echo
-    Curses.cbreak
-    Curses.nonl
+  def setup_window window
+    window.keypad=true
   end
 
-  def cleanup_one_line_input
-    Curses.nl
-    Curses.nocbreak
+  def setup_input 
+    Curses.nonl
+    Curses.noecho
+    Curses.cbreak
+  end
+
+  def setup_input_config 
+    Curses.echo
+  end
+
+  def clean_input_config 
     Curses.noecho
   end
 end

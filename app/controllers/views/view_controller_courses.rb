@@ -1,12 +1,15 @@
+require 'byebug'
 require 'observer'
 require 'singleton'
 require './app/helpers/event_helper'
+require './app/helpers/input_helper'
 require './app/models/courses_model'
 
 class ViewControllerCourses
-  include EventHelper
   include Observable
   include Singleton
+  include EventHelper
+  include InputHelper
   WINDOW_LEFT_MARGIN = 4
   WINDOW_BOTTOM_MARGIN = 1
 
@@ -19,12 +22,19 @@ class ViewControllerCourses
     @window.close
   end
 
+  def create_window
+    @window ||= Window.new(Curses.lines - WINDOW_BOTTOM_MARGIN, Curses.cols, 0, 0)
+    setup_window @window
+    @window
+  end
+
   def draw
-    @window = Window.new(Curses.lines - WINDOW_BOTTOM_MARGIN, Curses.cols, 0, 0)
+    @window = create_window
     @window.refresh
 
     draw_menu 
     while ch = @window.getch
+      p "courses:#{ch}"
       case ch
       when 'k'
         @position -= 1
