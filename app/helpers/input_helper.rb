@@ -10,10 +10,10 @@ module InputHelper
   end
 
   def setup_input_config 
-    Curses.echo
+    #Curses.echo
   end
 
   def clean_input_config 
-    Curses.noecho
+    #Curses.noecho
   end
 end

@@ -15,6 +15,8 @@ class ViewControllerConfig
   WINDOW_HEIGHT = 1
 
   def close
+    @window.clear
+    @window.refresh
     @window.close
     @window = nil
   end
@@ -39,18 +41,17 @@ class ViewControllerConfig
 
     while(input = @window.getch)
       case input
-      when KEY_COLON
+      when KEY_ENTER
+        # process input
         case c_input
         when 'q'
-          clean_input_config 
           close
           event_object = {:event => EVENT_QUIT}
           send_notification(event_object)
           break
         else
-          #byebug
+          # TODO: add cases for valid commands in this case block
           # input not valid, show error and close window
-          clean_input_config 
           close
           event_object = {
             :event => EVENT_ERROR,
@@ -60,12 +61,13 @@ class ViewControllerConfig
           break
         end
       when KEY_ESCAPE
-        p "escape entered"
-        clean_input_config 
         close
         event_object = {:event => EVENT_ESCAPE}
         send_notification(event_object)
+        break
       else
+        @window.addstr("#{input}")
+        @window.refresh
         # append input to current input
         c_input << input
       end
