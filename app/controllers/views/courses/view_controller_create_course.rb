@@ -56,7 +56,6 @@ class ViewControllerCreateCourse
           send_notification(event_object)
           break
         else
-          # TODO: add cases for valid commands in this case block
           # input not valid, show error and close window
           close
           event_object = {

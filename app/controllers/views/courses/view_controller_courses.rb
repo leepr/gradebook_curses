@@ -51,8 +51,8 @@ class ViewControllerCourses
         send_notification(event_object)
         break
       end
-      @position = (@courses.size) if @position < 0
-      @position = 0 if @position > (@courses.size) 
+      @position = (@courses.size-1) if @position < 0
+      @position = 0 if @position > (@courses.size-1) 
       draw_menu 
     end
   end
