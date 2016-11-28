@@ -3,6 +3,7 @@ require 'observer'
 require 'singleton'
 require './app/helpers/event_helper'
 require './app/helpers/input_helper'
+require './app/helpers/keyboard_helper'
 require './app/models/courses_model'
 
 class ViewControllerCourses
@@ -10,6 +11,7 @@ class ViewControllerCourses
   include Singleton
   include EventHelper
   include InputHelper
+  include KeyboardHelper
   WINDOW_LEFT_MARGIN = 4
   WINDOW_BOTTOM_MARGIN = 1
 
@@ -24,6 +26,7 @@ class ViewControllerCourses
 
   def create_window
     @window ||= Window.new(Curses.lines - WINDOW_BOTTOM_MARGIN, Curses.cols, 0, 0)
+    @window.clear
     setup_window @window
     @window
   end
@@ -34,13 +37,16 @@ class ViewControllerCourses
 
     draw_menu 
     while ch = @window.getch
-      p "courses:#{ch}"
       case ch
-      when 'k'
+      when KEY_C
+        event_object = {:event => EVENT_CREATE_COURSE}
+        send_notification(event_object)
+        break
+      when KEY_K
         @position -= 1
-      when 'j'
+      when KEY_J
         @position += 1
-      when ':'
+      when KEY_COLON
         event_object = {:event => EVENT_COLON_PRESSED}
         send_notification(event_object)
         break
@@ -52,6 +58,8 @@ class ViewControllerCourses
   end
 
   def draw_menu
+    # draw courses
+    @courses = CoursesModel.instance.courses
     @courses.each_with_index do |course, i|
       @window.setpos(i+1, WINDOW_LEFT_MARGIN)
       @window.attrset(i==@position ? A_STANDOUT : A_NORMAL)
@@ -61,9 +69,6 @@ class ViewControllerCourses
     # draw menu
     @window.setpos(@courses.size+1, WINDOW_LEFT_MARGIN)
     @window.attrset(@courses.size==@position ? A_STANDOUT : A_NORMAL)
-    @window.addstr("(c): create course; (d): delete course; (r): rename course; (x) exit")
-
-    @window.setpos(10, WINDOW_LEFT_MARGIN)
-    @window.addstr "pos:#{@position}"
+    @window.addstr("(c) create course; (d) delete course; (r) rename course")
   end
 end

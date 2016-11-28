@@ -1,5 +1,8 @@
 module EventHelper
+  EVENT_AUTO_SAVE_DATA = :auto_save_data
   EVENT_COLON_PRESSED = :event_colon
+  EVENT_CREATE_COURSE = :event_create_course
+  EVENT_CREATED_COURSE = :event_created_course
   EVENT_ERROR = :event_error
   EVENT_ESCAPE = :event_escape
   EVENT_QUIT = :event_quit

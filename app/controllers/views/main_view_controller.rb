@@ -1,7 +1,8 @@
 require 'byebug'
 require 'singleton'
 require './app/controllers/views/menu_controller'
-require './app/controllers/views/view_controller_courses'
+require './app/controllers/views/courses/view_controller_create_course'
+require './app/controllers/views/courses/view_controller_courses'
 require './app/controllers/views/view_controller_config'
 require './app/controllers/views/view_controller_error'
 require './app/helpers/input_helper'
@@ -29,10 +30,17 @@ class MainViewController
 
   def update(event_obj)
       #byebug
-    if event_obj[:event]==EVENT_COLON_PRESSED
+    case event_obj[:event] 
+    when EVENT_COLON_PRESSED
       @context.add_context ContextModel::CONTEXT_CONFIG
       draw
-    elsif event_obj[:event]==EVENT_ERROR
+    when EVENT_CREATE_COURSE
+      @context.add_context ContextModel::CONTEXT_CREATE_COURSE
+      draw
+    when EVENT_CREATED_COURSE
+      @context.remove_context 
+      draw
+    when EVENT_ERROR
       # remove context
       @context.remove_context 
 
@@ -40,13 +48,13 @@ class MainViewController
       @context.message=event_obj[:message]
       @context.add_context ContextModel::CONTEXT_ERROR
       draw
-    elsif event_obj[:event]==EVENT_ESCAPE
+    when EVENT_ESCAPE
       @context.remove_context 
       draw
-    elsif event_obj[:event]==EVENT_FINISHED_DISPLAYING_STATUS
+    when EVENT_FINISHED_DISPLAYING_STATUS
       @context.remove_context 
       draw
-    elsif event_obj[:event]==EVENT_QUIT
+    when EVENT_QUIT
       @context.remove_context 
 
       # remove main window
@@ -56,20 +64,24 @@ class MainViewController
 
   private
   def close_window
-    if @context.context == ContextModel::CONTEXT_COURSES
+    if(@context.context == ContextModel::CONTEXT_COURSES)
       @controller = ViewControllerCourses.instance
     end
     @controller.close
   end
 
   def draw
-    if @context.context == ContextModel::CONTEXT_COURSES
+    case @context.context
+    when ContextModel::CONTEXT_COURSES
       @controller = ViewControllerCourses.instance
       @controller.add_observer(self)
-    elsif @context.context == ContextModel::CONTEXT_CONFIG
+    when ContextModel::CONTEXT_CREATE_COURSE
+      @controller = ViewControllerCreateCourse.instance
+      @controller.add_observer(self)
+    when ContextModel::CONTEXT_CONFIG
       @controller = ViewControllerConfig.instance
       @controller.add_observer(self)
-    elsif @context.context == ContextModel::CONTEXT_ERROR
+    when ContextModel::CONTEXT_ERROR
       @controller = ViewControllerError.instance
       @controller.add_observer(self)
     end

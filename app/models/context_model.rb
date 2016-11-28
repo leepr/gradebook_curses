@@ -8,6 +8,7 @@ class ContextModel
 
   CONTEXT_CONFIG = :config
   CONTEXT_COURSES = :courses
+  CONTEXT_CREATE_COURSE = :create_course
   CONTEXT_STUDENTS = :students
   CONTEXT_ERROR = :error
 
