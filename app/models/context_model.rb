@@ -4,11 +4,12 @@ require 'singleton'
 class ContextModel
   include Singleton
 
-  attr_accessor :message
+  attr_accessor :course_index, :message
 
   CONTEXT_CONFIG = :config
   CONTEXT_COURSES = :courses
   CONTEXT_CREATE_COURSE = :create_course
+  CONTEXT_DELETE_COURSE = :delete_course
   CONTEXT_STUDENTS = :students
   CONTEXT_ERROR = :error
 

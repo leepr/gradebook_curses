@@ -42,6 +42,12 @@ class ViewControllerCourses
         event_object = {:event => EVENT_CREATE_COURSE}
         send_notification(event_object)
         break
+      when KEY_D
+        event_object = {:event => EVENT_DELETE_COURSE,
+          :course_index => @position
+        }
+        send_notification(event_object)
+        break
       when KEY_K
         @position -= 1
       when KEY_J
@@ -59,11 +65,14 @@ class ViewControllerCourses
 
   def draw_menu
     # draw courses
+    @course_map = {}
     @courses = CoursesModel.instance.courses
     @courses.each_with_index do |course, i|
+      @course_map[i] = course
       @window.setpos(i+1, WINDOW_LEFT_MARGIN)
       @window.attrset(i==@position ? A_STANDOUT : A_NORMAL)
-      @window.addstr "#{i+1}: #{course}"
+      #byebug
+      @window.addstr "#{i+1}: #{course["name"]}"
     end
 
     # draw menu

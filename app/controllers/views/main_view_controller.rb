@@ -1,8 +1,7 @@
 require 'byebug'
 require 'singleton'
 require './app/controllers/views/menu_controller'
-require './app/controllers/views/courses/view_controller_create_course'
-require './app/controllers/views/courses/view_controller_courses'
+Dir['./app/controllers/views/courses/*.rb'].each{|file| require file}
 require './app/controllers/views/view_controller_config'
 require './app/controllers/views/view_controller_error'
 require './app/helpers/input_helper'
@@ -36,6 +35,13 @@ class MainViewController
       draw
     when EVENT_CREATE_COURSE
       @context.add_context ContextModel::CONTEXT_CREATE_COURSE
+      draw
+    when EVENT_DELETE_COURSE
+      @context.course_index = event_obj[:course_index]
+      @context.add_context ContextModel::CONTEXT_DELETE_COURSE
+      draw
+    when EVENT_DELETED_COURSE
+      @context.remove_context 
       draw
     when EVENT_CREATED_COURSE
       @context.remove_context 
@@ -77,6 +83,9 @@ class MainViewController
       @controller.add_observer(self)
     when ContextModel::CONTEXT_CREATE_COURSE
       @controller = ViewControllerCreateCourse.instance
+      @controller.add_observer(self)
+    when ContextModel::CONTEXT_DELETE_COURSE
+      @controller = ViewControllerDeleteCourse.instance
       @controller.add_observer(self)
     when ContextModel::CONTEXT_CONFIG
       @controller = ViewControllerConfig.instance
