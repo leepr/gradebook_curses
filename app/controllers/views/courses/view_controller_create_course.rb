@@ -14,6 +14,7 @@ class ViewControllerCreateCourse
 
   WINDOW_LEFT_MARGIN = 2
   WINDOW_HEIGHT = 1
+  WINDOW_PROMPT = "Enter new course name:"
 
   def close
     @window.clear
@@ -35,7 +36,7 @@ class ViewControllerCreateCourse
   def draw
     @window = create_window
     @window.attrset(A_NORMAL)
-    @window.addstr("Enter new course name:")
+    @window.addstr(WINDOW_PROMPT)
     @window.refresh
 
     c_input = ""
@@ -70,6 +71,12 @@ class ViewControllerCreateCourse
         event_object = {:event => EVENT_ESCAPE}
         send_notification(event_object)
         break
+      when KEY_BACKSPACE
+        # remove previous character
+        @window.clear
+        c_input = c_input[0..-2]
+        @window.addstr(WINDOW_PROMPT + c_input)
+        @window.refresh
       else
         # append input to current input
         @window.addstr("#{input}")
