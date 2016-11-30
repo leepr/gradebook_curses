@@ -30,6 +30,7 @@ class ViewControllerCreateCourse
   def create_window
     @window ||= Window.new(WINDOW_HEIGHT, Curses.cols, Curses.lines-WINDOW_HEIGHT, 0)
     setup_input_config
+    @window.keypad = true
     @window
   end
 
@@ -73,9 +74,29 @@ class ViewControllerCreateCourse
         break
       when KEY_BACKSPACE
         # remove previous character
+        saved_xpos = @window.curx
+        inputpos = saved_xpos-WINDOW_PROMPT.size
+        c_input = c_input[0..(inputpos-2)] + c_input[(inputpos)..-1]
         @window.clear
-        c_input = c_input[0..-2]
         @window.addstr(WINDOW_PROMPT + c_input)
+        @window.refresh
+        @window.setpos(@window.cury, saved_xpos-1)
+      when KEY_LEFT
+        xpos = @window.curx
+        # if cursor is located to the right of the prompt 
+        if(xpos > (WINDOW_PROMPT.size))
+          @window.setpos(@window.cury, @window.curx-1)
+          @window.refresh
+        end
+      when KEY_RIGHT
+        xpos = @window.curx
+        # if cursor is located to the right of the prompt 
+        if(xpos < (WINDOW_PROMPT.size+c_input.size-1))
+          @window.setpos(@window.cury, @window.curx+1)
+          @window.refresh
+        end
+      when KEY_DELETE
+        @window.delch
         @window.refresh
       else
         # append input to current input

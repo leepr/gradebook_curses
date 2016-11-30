@@ -6,5 +6,8 @@ module KeyboardHelper
   KEY_J = 'j'
   KEY_ENTER = 13
   KEY_ESCAPE = 27
-  KEY_BACKSPACE = 127
+  KEY_BACKSPACE = 263
+  KEY_LEFT = 260
+  KEY_RIGHT = 261
+  KEY_DELETE = 330
 end
