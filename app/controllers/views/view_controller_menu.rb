@@ -1,4 +1,4 @@
-class MenuController
+class ViewControllerMenu
   def initialize window
     @window=window 
     @position=0

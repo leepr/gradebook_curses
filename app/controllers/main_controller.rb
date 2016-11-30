@@ -1,5 +1,5 @@
 require 'singleton'
-require './app/controllers/views/main_view_controller'
+require './app/controllers/views/view_controller_main'
 require "./app/models/logger_model"
 require "./app/models/property_model"
 require "./app/models/storage_model"
@@ -14,7 +14,7 @@ class MainController
   def initialize
     load_data
     
-    @main_view = MainViewController.instance
+    @main_view = ViewControllerMain.instance
     @main_view.init
   end
 

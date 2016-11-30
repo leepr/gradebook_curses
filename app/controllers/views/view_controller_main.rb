@@ -1,6 +1,6 @@
 require 'byebug'
 require 'singleton'
-require './app/controllers/views/menu_controller'
+require './app/controllers/views/view_controller_menu'
 Dir['./app/controllers/views/courses/*.rb'].each{|file| require file}
 require './app/controllers/views/view_controller_config'
 require './app/controllers/views/view_controller_error'
@@ -9,7 +9,7 @@ require './app/helpers/event_helper'
 require './app/models/context_model'
 require './app/models/courses_model'
 
-class MainViewController
+class ViewControllerMain
   include Singleton
   include EventHelper
   include InputHelper
@@ -24,7 +24,7 @@ class MainViewController
   end
 
   def draw_menu_window
-    @menu_controller = MenuController.new @window
+    @menu_controller = ViewControllerMenu.new @window
   end
 
   def update(event_obj)
@@ -58,6 +58,9 @@ class MainViewController
       @context.remove_context 
       draw
     when EVENT_FINISHED_DISPLAYING_STATUS
+      @context.add_context ContextModel::CONTEXT_SEARCH
+      draw
+    when EVENT_FORWARD_SLASH
       @context.remove_context 
       draw
     when EVENT_QUIT
@@ -92,6 +95,9 @@ class MainViewController
       @controller.add_observer(self)
     when ContextModel::CONTEXT_ERROR
       @controller = ViewControllerError.instance
+      @controller.add_observer(self)
+    when ContextModel::CONTEXT_SEARCH
+      @controller = ViewControllerSearch.instance
       @controller.add_observer(self)
     end
     @controller.draw

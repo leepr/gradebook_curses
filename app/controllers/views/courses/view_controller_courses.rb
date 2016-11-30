@@ -56,6 +56,10 @@ class ViewControllerCourses
         event_object = {:event => EVENT_COLON_PRESSED}
         send_notification(event_object)
         break
+      when KEY_FORWARD_SLASH
+        event_object = {:event => EVENT_FORWARD_SLASH_PRESSED}
+        send_notification(event_object)
+        break
       end
       @position = (@courses.size-1) if @position < 0
       @position = 0 if @position > (@courses.size-1) 

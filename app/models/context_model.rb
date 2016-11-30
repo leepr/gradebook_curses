@@ -10,8 +10,9 @@ class ContextModel
   CONTEXT_COURSES = :courses
   CONTEXT_CREATE_COURSE = :create_course
   CONTEXT_DELETE_COURSE = :delete_course
-  CONTEXT_STUDENTS = :students
   CONTEXT_ERROR = :error
+  CONTEXT_STUDENTS = :students
+  CONTEXT_SEARCH = :search
 
   def initialize
     @context = []
