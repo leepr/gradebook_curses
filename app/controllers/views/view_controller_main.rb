@@ -1,9 +1,7 @@
 require 'byebug'
 require 'singleton'
-require './app/controllers/views/view_controller_menu'
+Dir['./app/controllers/views/*.rb'].each{|file| require file}
 Dir['./app/controllers/views/courses/*.rb'].each{|file| require file}
-require './app/controllers/views/view_controller_config'
-require './app/controllers/views/view_controller_error'
 require './app/helpers/input_helper'
 require './app/helpers/event_helper'
 require './app/models/context_model'
@@ -58,16 +56,20 @@ class ViewControllerMain
       @context.remove_context 
       draw
     when EVENT_FINISHED_DISPLAYING_STATUS
-      @context.add_context ContextModel::CONTEXT_SEARCH
+      @context.remove_context
       draw
     when EVENT_FORWARD_SLASH
-      @context.remove_context 
+      @context.add_context ContextModel::CONTEXT_SEARCH
       draw
     when EVENT_QUIT
       @context.remove_context 
 
       # remove main window
       close_window
+    when EVENT_SEARCH_FINISHED
+      search_secondary_context(event_obj[:term])
+    when EVENT_SEARCH_INCREMENT
+      search_secondary_context(event_obj[:term], false)
     end
   end
 
@@ -101,5 +103,15 @@ class ViewControllerMain
       @controller.add_observer(self)
     end
     @controller.draw
+  end
+
+  def search_secondary_context(term, finished=true)
+    controller = nil
+    case @context.secondary_context
+    when ContextModel::CONTEXT_COURSES
+      controller = ViewControllerCourses.instance
+      #controller.add_observer(self)
+    end
+    controller.search(term, finished)
   end
 end

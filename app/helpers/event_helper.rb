@@ -7,9 +7,11 @@ module EventHelper
   EVENT_DELETED_COURSE = :event_deleted_course
   EVENT_ERROR = :event_error
   EVENT_ESCAPE = :event_escape
+  EVENT_FINISHED_DISPLAYING_STATUS = :event_finished_displaying_status
   EVENT_FORWARD_SLASH = :event_forward_slash
   EVENT_QUIT = :event_quit
-  EVENT_FINISHED_DISPLAYING_STATUS = :event_finished_displaying_status
+  EVENT_SEARCH_FINISHED = :event_search_finished
+  EVENT_SEARCH_INCREMENT = :event_search_increment
 
   def send_notification(event_object)
     changed

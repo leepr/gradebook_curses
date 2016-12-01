@@ -57,7 +57,7 @@ class ViewControllerCourses
         send_notification(event_object)
         break
       when KEY_FORWARD_SLASH
-        event_object = {:event => EVENT_FORWARD_SLASH_PRESSED}
+        event_object = {:event => EVENT_FORWARD_SLASH}
         send_notification(event_object)
         break
       end
@@ -67,21 +67,46 @@ class ViewControllerCourses
     end
   end
 
-  def draw_menu
+  def draw_menu(search_term=nil)
     # draw courses
-    @course_map = {}
     @courses = CoursesModel.instance.courses
     @courses.each_with_index do |course, i|
-      @course_map[i] = course
       @window.setpos(i+1, WINDOW_LEFT_MARGIN)
-      @window.attrset(i==@position ? A_STANDOUT : A_NORMAL)
-      #byebug
-      @window.addstr "#{i+1}: #{course["name"]}"
+      display_course(i, course["name"], search_term)
     end
 
     # draw menu
     @window.setpos(@courses.size+1, WINDOW_LEFT_MARGIN)
     @window.attrset(@courses.size==@position ? A_STANDOUT : A_NORMAL)
     @window.addstr("(c) create course; (d) delete course; (r) rename course")
+    @window.refresh
+  end
+
+  def search(term, finished)
+    draw_menu(term)
+  end
+
+  private
+  def display_course(index, course_name, search_term)
+    if search_term.nil?
+      @window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
+      @window.addstr "#{index+1}: #{course_name}"
+    else
+      # highlight matching strings
+      reg_pattern = /#{Regexp.quote(search_term)}/
+      if(match = reg_pattern.match(course_name) != nil)
+        # match
+        #@window.attrset(index==@position ? color_pair(COLOR_PAIR_HIGHLIGHT) : A_NORMAL)
+        #course_name.split("").each_with_index do |letter, j|
+          
+        #end
+        @window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT))
+        @window.addstr "#{index+1}: #{course_name}"
+      else
+        # no match
+        @window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
+        @window.addstr "#{index+1}: #{course_name}"
+      end
+    end
   end
 end

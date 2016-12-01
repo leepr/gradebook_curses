@@ -14,22 +14,25 @@ class ContextModel
   CONTEXT_STUDENTS = :students
   CONTEXT_SEARCH = :search
 
+  def add_context new_context
+    @context << new_context
+  end
+
   def initialize
     @context = []
     @context << CONTEXT_COURSES
   end
 
-  def add_context new_context
-    @context << new_context
+  def context
+    # primary context
+    @context.last
   end
 
   def remove_context
     @context.pop
   end
 
-  def context
-    @context.last
+  def secondary_context
+    @context[-2]
   end
-
-
 end
