@@ -4,7 +4,7 @@ require 'singleton'
 class ContextModel
   include Singleton
 
-  attr_accessor :course_index, :message, :search_context
+  attr_accessor :course_index, :message, :search_context, :search_term
 
   CONTEXT_CONFIG = :config
   CONTEXT_COURSES = :courses

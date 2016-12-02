@@ -67,13 +67,13 @@ class ViewControllerCourses
     end
   end
 
-  def draw_menu(search_term, search_finished=false)
+  def draw_menu(search_finished=false)
     # draw courses
     first_match = true
     @courses = CoursesModel.instance.courses
     @courses.each_with_index do |course, i|
       @window.setpos(i+1, WINDOW_LEFT_MARGIN)
-      display_course(i, course["name"], search_term, first_match && search_finished)
+      display_course(i, course["name"], first_match && search_finished)
     end
 
     # draw menu
@@ -83,12 +83,13 @@ class ViewControllerCourses
     @window.refresh
   end
 
-  def search(term, finished)
-    draw_menu(term, finished)
+  def search(finished)
+    draw_menu(finished)
   end
 
   private
-  def display_course(index, course_name, search_term, jump_to_first_match)
+  def display_course(index, course_name, jump_to_first_match)
+    search_term = ContextModel.instance.search_term
     if search_term.nil?
       @window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
       @window.addstr "#{index+1}: #{course_name}"
