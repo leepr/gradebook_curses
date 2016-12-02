@@ -67,9 +67,13 @@ class ViewControllerMain
       # remove main window
       close_window
     when EVENT_SEARCH_FINISHED
-      search_secondary_context(event_obj[:term])
+      @context.search_context=true
+      @context.remove_context 
+      #byebug
+      #draw
+      search_context(event_obj[:term], @context.context, true)
     when EVENT_SEARCH_INCREMENT
-      search_secondary_context(event_obj[:term], false)
+      search_context(event_obj[:term], @context.secondary_context)
     end
   end
 
@@ -105,13 +109,13 @@ class ViewControllerMain
     @controller.draw
   end
 
-  def search_secondary_context(term, finished=true)
+  def search_context(term, context, search_finished=false)
     controller = nil
-    case @context.secondary_context
+    case context
     when ContextModel::CONTEXT_COURSES
       controller = ViewControllerCourses.instance
-      #controller.add_observer(self)
     end
-    controller.search(term, finished)
+    #byebug
+    controller.search(term, search_finished)
   end
 end

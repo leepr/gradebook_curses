@@ -35,7 +35,7 @@ class ViewControllerCourses
     @window = create_window
     @window.refresh
 
-    draw_menu 
+    draw_menu nil
     while ch = @window.getch
       case ch
       when KEY_C
@@ -63,16 +63,17 @@ class ViewControllerCourses
       end
       @position = (@courses.size-1) if @position < 0
       @position = 0 if @position > (@courses.size-1) 
-      draw_menu 
+      draw_menu nil
     end
   end
 
-  def draw_menu(search_term=nil)
+  def draw_menu(search_term, search_finished=false)
     # draw courses
+    first_match = true
     @courses = CoursesModel.instance.courses
     @courses.each_with_index do |course, i|
       @window.setpos(i+1, WINDOW_LEFT_MARGIN)
-      display_course(i, course["name"], search_term)
+      display_course(i, course["name"], search_term, first_match && search_finished)
     end
 
     # draw menu
@@ -83,11 +84,11 @@ class ViewControllerCourses
   end
 
   def search(term, finished)
-    draw_menu(term)
+    draw_menu(term, finished)
   end
 
   private
-  def display_course(index, course_name, search_term)
+  def display_course(index, course_name, search_term, jump_to_first_match)
     if search_term.nil?
       @window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
       @window.addstr "#{index+1}: #{course_name}"
@@ -96,13 +97,20 @@ class ViewControllerCourses
       reg_pattern = /#{Regexp.quote(search_term)}/
       matches = course_name.to_enum(:scan, reg_pattern).map{Regexp.last_match}
       unless matches.empty?
+        if jump_to_first_match
+          #byebug
+          p "jumping to first match"
+          # if first match then jump to it
+          @position = @window.cury
+          jump_to_first_match = false
+        end
         # match
         @window.addstr "#{index+1}: "
         course_name.split("").each_with_index do |letter, j|
           if in_matches(matches, j)
             @window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT))
           else
-            @window.attrset(A_NORMAL)
+            @window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
           end
           @window.addch(letter)
         end
@@ -112,6 +120,7 @@ class ViewControllerCourses
         @window.addstr "#{index+1}: #{course_name}"
       end
     end
+    return !jump_to_first_match
   end
 
   def in_matches(matches, j)

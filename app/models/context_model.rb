@@ -4,7 +4,7 @@ require 'singleton'
 class ContextModel
   include Singleton
 
-  attr_accessor :course_index, :message
+  attr_accessor :course_index, :message, :search_context
 
   CONTEXT_CONFIG = :config
   CONTEXT_COURSES = :courses
@@ -21,6 +21,7 @@ class ContextModel
   def initialize
     @context = []
     @context << CONTEXT_COURSES
+    @search_context = false
   end
 
   def context
