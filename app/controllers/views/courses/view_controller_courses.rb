@@ -94,19 +94,30 @@ class ViewControllerCourses
     else
       # highlight matching strings
       reg_pattern = /#{Regexp.quote(search_term)}/
-      if(match = reg_pattern.match(course_name) != nil)
+      matches = course_name.to_enum(:scan, reg_pattern).map{Regexp.last_match}
+      unless matches.empty?
         # match
-        #@window.attrset(index==@position ? color_pair(COLOR_PAIR_HIGHLIGHT) : A_NORMAL)
-        #course_name.split("").each_with_index do |letter, j|
-          
-        #end
-        @window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT))
-        @window.addstr "#{index+1}: #{course_name}"
+        @window.addstr "#{index+1}: "
+        course_name.split("").each_with_index do |letter, j|
+          if in_matches(matches, j)
+            @window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT))
+          else
+            @window.attrset(A_NORMAL)
+          end
+          @window.addch(letter)
+        end
       else
         # no match
         @window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
         @window.addstr "#{index+1}: #{course_name}"
       end
     end
+  end
+
+  def in_matches(matches, j)
+    matches.each do |match|
+      return true if((j >= match.offset(0)[0]) && (j < match.offset(0)[1]))
+    end
+    false
   end
 end
