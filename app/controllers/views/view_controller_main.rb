@@ -26,7 +26,6 @@ class ViewControllerMain
   end
 
   def update(event_obj)
-      #byebug
     case event_obj[:event] 
     when EVENT_COLON_PRESSED
       @context.add_context ContextModel::CONTEXT_CONFIG
@@ -70,7 +69,6 @@ class ViewControllerMain
       @context.search_context=true
       @context.search_term=event_obj[:term]
       @context.remove_context 
-      #byebug
       #draw
       search_context(@context.context, true)
     when EVENT_SEARCH_INCREMENT
@@ -117,7 +115,6 @@ class ViewControllerMain
     when ContextModel::CONTEXT_COURSES
       controller = ViewControllerCourses.instance
     end
-    #byebug
     controller.search(search_finished)
   end
 end
