@@ -71,6 +71,7 @@ class ViewControllerCourses
   def draw_menu
     # draw courses
     @courses = CoursesModel.instance.courses
+
     @courses.each_with_index do |course, i|
       @window.setpos(i+WINDOW_VERTICAL_OFFSET, WINDOW_LEFT_MARGIN)
       display_course(i, course["name"])
@@ -93,6 +94,7 @@ class ViewControllerCourses
 
   def search(finished)
     set_jump finished
+    search_display_data 
     if finished == true
       draw
     else
@@ -101,6 +103,45 @@ class ViewControllerCourses
   end
 
   private
+  def display_data
+    # collect data to search through 
+    # aggregate into a list where each element represents a line
+    data = []
+    courses = CoursesModel.instance.courses
+    courses.each {|course|data << course["name"]}
+    data
+  end
+
+  def current_match=(new_match)
+    @current_match
+  end
+
+  def current_match
+    @current_match
+  end
+
+  def search_display_data 
+    search_term = ContextModel.instance.search_term
+    
+    # go through each token and find matches
+    @matches = []
+    reg_pattern = /#{Regexp.quote(search_term)}/
+    
+    display_data.each_with_index do |token, index|
+      matches = token.to_enum(:scan, reg_pattern).map{Regexp.last_match}
+      unless matches.empty?
+        matches.each do |match|
+          @matches << match
+          if get_jump
+            current_match=match
+            @position = index
+            set_jump false
+          end
+        end
+      end
+    end
+  end
+
   def display_course(index, course_name)
     search_term = ContextModel.instance.search_term
     if search_term.nil?
@@ -111,12 +152,8 @@ class ViewControllerCourses
       reg_pattern = /#{Regexp.quote(search_term)}/
       matches = course_name.to_enum(:scan, reg_pattern).map{Regexp.last_match}
       unless matches.empty?
-        if get_jump
-          # if first match then jump to it
-          @position = @window.cury - WINDOW_VERTICAL_OFFSET
-          set_jump false
-        end
         # match
+        @window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
         @window.addstr "#{index+1}: "
         course_name.split("").each_with_index do |letter, j|
           if in_matches(matches, j)
