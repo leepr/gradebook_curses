@@ -1,9 +1,11 @@
 module KeyboardHelper
   KEY_COLON = ':'
-  KEY_C = 'c'
-  KEY_D = 'd'
-  KEY_K = 'k'
-  KEY_J = 'j'
+  KEY_C_LOWER = 'c'
+  KEY_D_LOWER = 'd'
+  KEY_K_LOWER = 'k'
+  KEY_J_LOWER = 'j'
+  KEY_N_LOWER = 'n'
+  KEY_N_UPPER = 'N'
   KEY_FORWARD_SLASH = '/'
   KEY_ENTER = 13
   KEY_ESCAPE = 27

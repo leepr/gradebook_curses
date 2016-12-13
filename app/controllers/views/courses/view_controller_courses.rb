@@ -39,20 +39,24 @@ class ViewControllerCourses
     draw_menu 
     while ch = @window.getch
       case ch
-      when KEY_C
+      when KEY_C_LOWER
         event_object = {:event => EVENT_CREATE_COURSE}
         send_notification(event_object)
         break
-      when KEY_D
+      when KEY_D_LOWER
         event_object = {:event => EVENT_DELETE_COURSE,
           :course_index => @position
         }
         send_notification(event_object)
         break
-      when KEY_K
+      when KEY_K_LOWER
         @position -= 1
-      when KEY_J
+      when KEY_J_LOWER
         @position += 1
+      when KEY_N_LOWER
+        p "need to jump to next match"
+      when KEY_N_UPPER
+        p "need to jump to previous match"
       when KEY_COLON
         event_object = {:event => EVENT_COLON_PRESSED}
         send_notification(event_object)

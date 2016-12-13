@@ -95,7 +95,7 @@ class ViewControllerCreateCourse
           @window.setpos(@window.cury, @window.curx+1)
           @window.refresh
         end
-      when KEY_DELETE
+      when KEY_D_LOWERELETE
         @window.delch
         @window.refresh
       else
