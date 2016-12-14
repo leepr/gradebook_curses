@@ -185,8 +185,8 @@ class ViewControllerCourses
     end
   end
 
-  def in_matches(matches, j)
-    matches.each do |match|
+  def in_matches(my_matches, j)
+    my_matches.each do |match|
       return true if((j >= match.offset(0)[0]) && (j < match.offset(0)[1]))
     end
     false

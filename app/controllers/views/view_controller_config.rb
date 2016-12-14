@@ -13,6 +13,7 @@ class ViewControllerConfig
 
   WINDOW_LEFT_MARGIN = 2
   WINDOW_HEIGHT = 1
+  WINDOW_PROMPT = ":"
 
   def close
     @window.clear
@@ -28,13 +29,14 @@ class ViewControllerConfig
   def create_window
     @window ||= Window.new(WINDOW_HEIGHT, Curses.cols, Curses.lines-WINDOW_HEIGHT, 0)
     setup_input_config
+    setup_window @window
     @window
   end
 
   def draw
     @window = create_window
     @window.attrset(A_NORMAL)
-    @window.addstr(":")
+    @window.addstr(WINDOW_PROMPT)
     @window.refresh
 
     c_input = ""
@@ -65,6 +67,15 @@ class ViewControllerConfig
         event_object = {:event => EVENT_ESCAPE}
         send_notification(event_object)
         break
+      when KEY_BACKSPACE
+        # remove previous character
+        saved_xpos = @window.curx
+        inputpos = saved_xpos-WINDOW_PROMPT.size
+        c_input = c_input[0..(inputpos-2)] + c_input[(inputpos)..-1]
+        @window.clear
+        @window.addstr(WINDOW_PROMPT + c_input)
+        @window.refresh
+        @window.setpos(@window.cury, saved_xpos-1)
       else
         @window.addstr("#{input}")
         @window.refresh
