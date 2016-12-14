@@ -4,6 +4,7 @@ require 'singleton'
 require './app/helpers/event_helper'
 require './app/helpers/input_helper'
 require './app/helpers/keyboard_helper'
+require './app/helpers/search_helper'
 require './app/models/courses_model'
 
 class ViewControllerCourses
@@ -12,6 +13,7 @@ class ViewControllerCourses
   include EventHelper
   include InputHelper
   include KeyboardHelper
+  include SearchHelper
   WINDOW_LEFT_MARGIN = 4
   WINDOW_BOTTOM_MARGIN = 1
   WINDOW_VERTICAL_OFFSET = 1
@@ -114,46 +116,6 @@ class ViewControllerCourses
     courses = CoursesModel.instance.courses
     courses.each {|course|data << course["name"]}
     data
-  end
-
-  def current_match=(new_match)
-    @current_match
-  end
-
-  def current_match
-    @current_match
-  end
-
-  def matches=(new_matches)
-    @matches = new_matches
-  end
-
-  def add_match(new_match)
-    @matches ||= []
-    @matches << new_match
-  end
-
-  def matches
-    @matches
-  end
-
-  def search_display_data 
-    search_term = ContextModel.instance.search_term
-    
-    # go through each token and find matches
-    reg_pattern = /#{Regexp.quote(search_term)}/
-    
-    display_data.each_with_index do |token, index|
-      matches = token.to_enum(:scan, reg_pattern).map{Regexp.last_match}
-      matches.each do |match|
-        add_match match
-        if get_jump
-          current_match=match
-          @position = index
-          set_jump false
-        end
-      end
-    end
   end
 
   def display_course(index, course_name)
