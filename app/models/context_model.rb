@@ -12,7 +12,8 @@ class ContextModel
   CONTEXT_DELETE_COURSE = :delete_course
   CONTEXT_ERROR = :error
   CONTEXT_STUDENTS = :students
-  CONTEXT_SEARCH = :search
+  CONTEXT_SEARCH_FORWARD = :search_forward
+  CONTEXT_SEARCH_BACKWARD = :search_backward
 
   def add_context new_context
     @context << new_context

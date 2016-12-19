@@ -58,7 +58,10 @@ class ViewControllerMain
       @context.remove_context
       draw
     when EVENT_FORWARD_SLASH
-      @context.add_context ContextModel::CONTEXT_SEARCH
+      @context.add_context ContextModel::CONTEXT_SEARCH_FORWARD
+      draw
+    when EVENT_QUESTION_MARK
+      @context.add_context ContextModel::CONTEXT_SEARCH_BACKWARD
       draw
     when EVENT_QUIT
       @context.remove_context 
@@ -102,7 +105,7 @@ class ViewControllerMain
     when ContextModel::CONTEXT_ERROR
       @controller = ViewControllerError.instance
       @controller.add_observer(self)
-    when ContextModel::CONTEXT_SEARCH
+    when ContextModel::CONTEXT_SEARCH_FORWARD, ContextModel::CONTEXT_SEARCH_BACKWARD
       @controller = ViewControllerSearch.instance
       @controller.add_observer(self)
     end

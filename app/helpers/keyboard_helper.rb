@@ -7,6 +7,7 @@ module KeyboardHelper
   KEY_N_LOWER = 'n'
   KEY_N_UPPER = 'N'
   KEY_FORWARD_SLASH = '/'
+  KEY_QUESTION_MARK = '?'
   KEY_ENTER = 13
   KEY_ESCAPE = 27
   KEY_BACKSPACE = 263
