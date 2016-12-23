@@ -22,7 +22,6 @@ class ContextModel
   def initialize
     @context = []
     @context << CONTEXT_COURSES
-    @search_context = false
   end
 
   def context

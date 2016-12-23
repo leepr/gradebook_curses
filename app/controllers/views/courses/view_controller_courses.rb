@@ -50,9 +50,9 @@ class ViewControllerCourses
       when KEY_J_LOWER
         @position += 1
       when KEY_N_LOWER
-        jump_to_next_match
+        jump_to_match(true)
       when KEY_N_UPPER
-        p "need to jump to previous match"
+        jump_to_match(false)
       when KEY_COLON
         event_object = {:event => EVENT_COLON_PRESSED}
         send_notification(event_object)

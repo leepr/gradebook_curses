@@ -22,9 +22,19 @@ module SearchHelper
     @position = @matches[0].fetch(:line_pos)
   end
 
-  def jump_to_next_match
+  def jump_to_match(next_match=true)
+    # forward/backward
     populate_matches
-    new_match_index = (@match_index == (@matches.size-1)) ? 0 : @match_index+1
+
+    search_mode = ContextModel.instance.search_context
+    forward_offset = next_match == true ? 1 : -1
+    offset = search_mode == ContextModel::CONTEXT_SEARCH_FORWARD ? forward_offset : forward_offset*-1
+
+    new_match_index = @match_index+offset
+
+    # wrap
+    new_match_index = 0 if (new_match_index == @matches.size)
+    new_match_index = (@matches.size-1) if (new_match_index == -1)
     set_match_index new_match_index
     @position = @matches[new_match_index].fetch(:line_pos)
   end

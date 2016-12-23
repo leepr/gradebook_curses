@@ -59,9 +59,11 @@ class ViewControllerMain
       draw
     when EVENT_FORWARD_SLASH
       @context.add_context ContextModel::CONTEXT_SEARCH_FORWARD
+      @context.search_context = ContextModel::CONTEXT_SEARCH_FORWARD
       draw
     when EVENT_QUESTION_MARK
       @context.add_context ContextModel::CONTEXT_SEARCH_BACKWARD
+      @context.search_context = ContextModel::CONTEXT_SEARCH_BACKWARD
       draw
     when EVENT_QUIT
       @context.remove_context 
@@ -69,7 +71,6 @@ class ViewControllerMain
       # remove main window
       close_window
     when EVENT_SEARCH_FINISHED
-      @context.search_context=true
       @context.search_term=event_obj[:term]
       @context.remove_context 
       #draw
