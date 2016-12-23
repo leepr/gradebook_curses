@@ -2,6 +2,7 @@ require 'byebug'
 require 'singleton'
 Dir['./app/controllers/views/*.rb'].each{|file| require file}
 Dir['./app/controllers/views/courses/*.rb'].each{|file| require file}
+Dir['./app/controllers/views/students/*.rb'].each{|file| require file}
 require './app/helpers/input_helper'
 require './app/helpers/event_helper'
 require './app/models/context_model'
@@ -78,6 +79,22 @@ class ViewControllerMain
     when EVENT_SEARCH_INCREMENT
       @context.search_term=event_obj[:term]
       search_context(@context.secondary_context)
+    when EVENT_STUDENT_CREATE
+      @context.add_context ContextModel::CONTEXT_STUDENT_CREATE
+      draw
+    when EVENT_STUDENT_CREATE
+      @context.add_context ContextModel::CONTEXT_STUDENT_DELETE
+      draw
+    when EVENT_STUDENT_CREATED
+      @context.remove_context 
+      draw
+    when EVENT_STUDENT_DELETED
+      @context.remove_context 
+      draw
+    when EVENT_STUDENT_MENU
+      @context.remove_context
+      @context.add_context ContextModel::CONTEXT_STUDENTS
+      draw
     end
   end
 
@@ -108,6 +125,12 @@ class ViewControllerMain
       @controller.add_observer(self)
     when ContextModel::CONTEXT_SEARCH_FORWARD, ContextModel::CONTEXT_SEARCH_BACKWARD
       @controller = ViewControllerSearch.instance
+      @controller.add_observer(self)
+    when ContextModel::CONTEXT_STUDENTS
+      @controller = ViewControllerStudents.instance
+      @controller.add_observer(self)
+    when ContextModel::CONTEXT_STUDENT_CREATE
+      @controller = ViewControllerCreateStudent.instance
       @controller.add_observer(self)
     end
     @controller.draw

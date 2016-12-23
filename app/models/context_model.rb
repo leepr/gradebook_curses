@@ -14,6 +14,8 @@ class ContextModel
   CONTEXT_STUDENTS = :students
   CONTEXT_SEARCH_FORWARD = :search_forward
   CONTEXT_SEARCH_BACKWARD = :search_backward
+  CONTEXT_STUDENT_CREATE = :student_create
+  CONTEXT_STUDENT_DELETE = :student_delete
 
   def add_context new_context
     @context << new_context

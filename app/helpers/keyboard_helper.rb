@@ -6,6 +6,8 @@ module KeyboardHelper
   KEY_J_LOWER = 'j'
   KEY_N_LOWER = 'n'
   KEY_N_UPPER = 'N'
+  KEY_Q_LOWER = 'q'
+  KEY_S_LOWER = 's'
   KEY_FORWARD_SLASH = '/'
   KEY_QUESTION_MARK = '?'
   KEY_ENTER = 13

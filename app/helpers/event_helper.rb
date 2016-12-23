@@ -13,6 +13,11 @@ module EventHelper
   EVENT_QUIT = :event_quit
   EVENT_SEARCH_FINISHED = :event_search_finished
   EVENT_SEARCH_INCREMENT = :event_search_increment
+  EVENT_STUDENT_MENU = :event_student_menu
+  EVENT_STUDENT_CREATE = :event_create_student
+  EVENT_STUDENT_CREATED = :event_created_student
+  EVENT_STUDENT_DELETE = :event_delete_student
+  EVENT_STUDENT_DELETED = :event_deleted_student
 
   def send_notification(event_object)
     changed
