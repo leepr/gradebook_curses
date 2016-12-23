@@ -16,18 +16,23 @@ module SearchHelper
     @matches << new_match
   end
 
+  def no_matches?
+    return true if @matches.nil? || @matches.empty?
+    false
+  end
+
   def jump_to_first_match
     populate_matches
     set_match_index 0
     @position = @matches[0].fetch(:line_pos)
   end
 
-  def jump_to_match(next_match=true)
+  def jump_to_match(forward=true)
     # forward/backward
     populate_matches
 
     search_mode = ContextModel.instance.search_context
-    forward_offset = next_match == true ? 1 : -1
+    forward_offset = forward == true ? 1 : -1
     offset = search_mode == ContextModel::CONTEXT_SEARCH_FORWARD ? forward_offset : forward_offset*-1
 
     new_match_index = @match_index+offset

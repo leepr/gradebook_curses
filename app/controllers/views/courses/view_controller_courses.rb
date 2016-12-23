@@ -50,8 +50,10 @@ class ViewControllerCourses
       when KEY_J_LOWER
         @position += 1
       when KEY_N_LOWER
+        next if no_matches?
         jump_to_match(true)
       when KEY_N_UPPER
+        next if no_matches?
         jump_to_match(false)
       when KEY_COLON
         event_object = {:event => EVENT_COLON_PRESSED}
