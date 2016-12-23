@@ -1,10 +1,10 @@
 module SearchHelper
-  def set_current_match new_match
-    @current_match
+  def set_match_index new_match_index
+    @match_index=new_match_index
   end
 
-  def current_match
-    @current_match
+  def match_index
+    @match_index
   end
 
   def set_matches new_matches
@@ -14,7 +14,19 @@ module SearchHelper
   def add_match new_match
     @matches ||= []
     @matches << new_match
-    p "setting matches to size:#{@matches.size}"
+  end
+
+  def jump_to_first_match
+    populate_matches
+    set_match_index 0
+    @position = @matches[0].fetch(:line_pos)
+  end
+
+  def jump_to_next_match
+    populate_matches
+    new_match_index = (@match_index == (@matches.size-1)) ? 0 : @match_index+1
+    set_match_index new_match_index
+    @position = @matches[new_match_index].fetch(:line_pos)
   end
 
   def clear_matches
@@ -25,18 +37,7 @@ module SearchHelper
     @matches
   end
 
-  def get_next_match
-  end
-
-  def set_jump(jump)
-    @jump_to_first_match=jump
-  end
-
-  def get_jump
-    @jump_to_first_match
-  end
-
-  def search_display_data 
+  def populate_matches 
     search_term = ContextModel.instance.search_term
     clear_matches
     
@@ -45,14 +46,8 @@ module SearchHelper
     
     display_data.each_with_index do |token, index|
       new_matches = token.to_enum(:scan, reg_pattern).map{Regexp.last_match}
-      #p "size after setting:#{matches.length}"
-      new_matches.each do |match|
-        add_match match
-        if get_jump
-          set_current_match match
-          @position = index
-          set_jump false
-        end
+      new_matches.each_with_index do |match, i|
+        add_match({line_pos: index, match: match})
       end
     end
   end

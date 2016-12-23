@@ -50,7 +50,7 @@ class ViewControllerCourses
       when KEY_J_LOWER
         @position += 1
       when KEY_N_LOWER
-        p "need to jump to next match"
+        jump_to_next_match
       when KEY_N_UPPER
         p "need to jump to previous match"
       when KEY_COLON
@@ -88,9 +88,10 @@ class ViewControllerCourses
   end
 
   def search(finished)
-    set_jump finished
-    search_display_data 
+    #set_jump finished
+    populate_matches 
     if finished == true
+      jump_to_first_match
       draw
     else
       draw_menu
