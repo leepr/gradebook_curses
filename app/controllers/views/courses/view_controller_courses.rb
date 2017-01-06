@@ -18,9 +18,11 @@ class ViewControllerCourses
   include WindowHelper
   WINDOW_LEFT_MARGIN = 4
   WINDOW_VERTICAL_OFFSET = 1
+  WINDOW_BOTTOM_BUFFER = 2
 
   def initialize
     @position = 0
+    @window_offset = 0
     @courses = CoursesModel.instance.courses
   end
 
@@ -47,8 +49,12 @@ class ViewControllerCourses
         break
       when KEY_K_LOWER
         @position -= 1
+        @window_offset -= 1 if(@position <= @window_offset && @window_offset != 0)
       when KEY_J_LOWER
         @position += 1
+        if((@position >= max_display_lines+@window_offset) && (@position+@window_offset != @courses.size))
+          @window_offset += 1 
+        end
       when KEY_N_LOWER
         next if no_matches?
         jump_to_match(true)
@@ -68,8 +74,16 @@ class ViewControllerCourses
         send_notification(event_object)
         break
       end
-      @position = (@courses.size-1) if @position < 0
-      @position = 0 if @position > (@courses.size-1) 
+
+      # wrap
+      if @position < 0
+        @position = (@courses.size-1)
+        @window_offset = @courses.size - max_display_lines unless @courses.size < max_display_lines
+      end
+      if @position > (@courses.size-1) 
+        @position = 0
+        @window_offset = 0
+      end
       draw_menu 
     end
   end
@@ -77,13 +91,24 @@ class ViewControllerCourses
   def draw_menu
     @courses = CoursesModel.instance.courses
 
+    window.clear
     @courses.each_with_index do |course, i|
-      window.setpos(i+WINDOW_VERTICAL_OFFSET, WINDOW_LEFT_MARGIN)
+      if(i<@window_offset || i>(@window_offset+@window.maxy+WINDOW_VERTICAL_OFFSET))
+        p "skipping: i:#{i} woffset:#{@window_offset}"
+        # skip if doesn't fit on screen
+        next
+      end
+      if(i>=(@window_offset+max_display_lines))
+        # skip if beyond screen
+        next
+      end
+      window.setpos(i+WINDOW_VERTICAL_OFFSET-@window_offset, WINDOW_LEFT_MARGIN)
       display_course(i, course["name"])
     end
 
     # draw menu
-    window.setpos(@courses.size+1, WINDOW_LEFT_MARGIN)
+    courses_displayed = @courses.size < window.maxy ? @courses.size : window.maxy
+    window.setpos(max_display_lines+WINDOW_BOTTOM_BUFFER, WINDOW_LEFT_MARGIN)
     window.attrset(@courses.size==@position ? A_STANDOUT : A_NORMAL)
     window.addstr("(c) create course; (d) delete course; (r) rename course")
     window.refresh
@@ -101,6 +126,10 @@ class ViewControllerCourses
   end
 
   private
+  def max_display_lines
+    return window.maxy-WINDOW_VERTICAL_OFFSET-WINDOW_BOTTOM_BUFFER
+  end
+
   def display_data
     # collect data to search through 
     # aggregate into a list where each element represents a line

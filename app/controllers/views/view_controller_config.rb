@@ -16,10 +16,12 @@ class ViewControllerConfig
   WINDOW_PROMPT = ":"
 
   def close
-    @window.clear
-    @window.refresh
-    @window.close
-    @window = nil
+    unless @window.nil?
+      @window.clear
+      @window.refresh
+      @window.close
+      @window = nil
+    end
   end
 
   def initialize

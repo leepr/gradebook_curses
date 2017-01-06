@@ -30,19 +30,7 @@ class MainController
       # load data
       @storage.init @properties
       @storage.load
-      
 
-      # TODO - create course to store data
-=begin
-      data = {
-        "courses" => ["Patrick", "Todd"]
-      }
-
-      @storage.save data
-=end
-
-
-      #p "Loaded data:#{@storage.data["courses"]}"
       @courses.init @storage.data["courses"]
     rescue Exception => error
       LoggerModel.instance.log("#{self.class} - Unable to load data using: #{error}.")

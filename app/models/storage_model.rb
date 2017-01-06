@@ -3,6 +3,7 @@ require 'json'
 require './app/helpers/event_helper'
 require './app/models/logger_model'
 require './app/models/courses_model'
+require './app/models/students_model'
 
 class StorageModel
   include Singleton
@@ -13,6 +14,9 @@ class StorageModel
     @properties = properties
     @courses_model = CoursesModel.instance
     @courses_model.add_observer(self)
+
+    @students_model = StudentsModel.instance
+    @students_model.add_observer(self)
 
     load_data 
   end
@@ -30,7 +34,8 @@ class StorageModel
     when EVENT_AUTO_SAVE_DATA
       # need to save data
       data = {
-        "courses" => @courses_model.courses
+        "courses" => @courses_model.courses,
+        "students" => @students_model.students
       }
 
       save_data data
