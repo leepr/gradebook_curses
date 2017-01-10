@@ -16,9 +16,6 @@ class ViewControllerCourses
   include KeyboardHelper
   include SearchHelper
   include WindowHelper
-  WINDOW_LEFT_MARGIN = 4
-  WINDOW_VERTICAL_OFFSET = 1
-  WINDOW_BOTTOM_BUFFER = 2
 
   def initialize
     @position = 0
@@ -49,7 +46,6 @@ class ViewControllerCourses
         break
       when KEY_K_LOWER
         @position -= 1
-        #@window_offset -= 1 if(@position <= @window_offset)
         @window_offset -= 1 if(@position < @window_offset)
       when KEY_J_LOWER
         @position += 1
@@ -89,71 +85,41 @@ class ViewControllerCourses
     end
   end
 
-  def draw_menu
-    @courses = CoursesModel.instance.courses
-
-    window.clear
-    @courses.each_with_index do |course, i|
-      if(i<@window_offset || i>(@window_offset+@window.maxy+WINDOW_VERTICAL_OFFSET))
-        p "skipping: i:#{i} woffset:#{@window_offset}"
-        # skip if doesn't fit on screen
-        next
-      end
-      if(i>=(@window_offset+max_display_lines))
-        # skip if beyond screen
-        next
-      end
-      window.setpos(i+WINDOW_VERTICAL_OFFSET-@window_offset, WINDOW_LEFT_MARGIN)
-      display_course(i, course["name"])
-    end
-
-    # draw menu
-    courses_displayed = @courses.size < window.maxy ? @courses.size : window.maxy
-    window.setpos(max_display_lines+WINDOW_BOTTOM_BUFFER, WINDOW_LEFT_MARGIN)
-    window.attrset(@courses.size==@position ? A_STANDOUT : A_NORMAL)
-    window.addstr("(c) create course; (d) delete course; (r) rename course")
-    window.refresh
-  end
-
-  def search(finished)
-    #set_jump finished
-    populate_matches 
-    if finished == true
-      jump_to_first_match
-      draw
-    else
-      draw_menu
-    end
-  end
-
   private
+  def menu_to_s
+    "(c) create course; (d) delete course; (r) rename course"
+  end
+
   def max_display_lines
     return window.maxy-WINDOW_VERTICAL_OFFSET-WINDOW_BOTTOM_BUFFER
   end
 
-  def display_data
+  def display_entries
     # collect data to search through 
     # aggregate into a list where each element represents a line
-    data = []
+    return @display_entries unless @display_entries.nil?
+    @display_entries = []
     courses = CoursesModel.instance.courses
-    courses.each {|course|data << course["name"]}
-    data
+    courses.each {|course| 
+      @display_entries << course["display_name"]
+    }
+    @display_entries
   end
 
-  def display_course(index, course_name)
+  def display_entry(index, entry_name)
     search_term = ContextModel.instance.search_term
     if search_term.nil?
       window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
-      window.addstr "#{index+1}: #{course_name}"
+      window.addstr "#{index+1}: #{entry_name}"
     else
       # highlight matching strings
       reg_pattern = /#{Regexp.quote(search_term)}/
-      matches = course_name.to_enum(:scan, reg_pattern).map{Regexp.last_match}
+      matches = entry_name.to_enum(:scan, reg_pattern).map{Regexp.last_match}
       unless matches.empty?
         # match
         window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
         window.addstr "#{index+1}: "
-        course_name.split("").each_with_index do |letter, j|
+        entry_name.split("").each_with_index do |letter, j|
           if in_matches(matches, j)
             window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT))
           else
@@ -164,7 +130,7 @@ class ViewControllerCourses
       else
         # no match
         window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
-        window.addstr "#{index+1}: #{course_name}"
+        window.addstr "#{index+1}: #{entry_name}"
       end
     end
   end

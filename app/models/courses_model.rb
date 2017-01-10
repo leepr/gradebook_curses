@@ -33,7 +33,7 @@ class CoursesModel
   private
     def create_course_object course_name
       course_obj = {}
-      course_obj["name"] = course_name
+      course_obj["display_name"] = course_name
       course_obj["hash"] = create_digest course_name
       course_obj
     end

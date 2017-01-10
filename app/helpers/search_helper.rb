@@ -23,8 +23,22 @@ module SearchHelper
 
   def jump_to_first_match
     populate_matches
-    set_match_index 0
-    @position = @matches[0].fetch(:line_pos)
+    unless @matches.empty?
+      set_match_index 0
+      @position = @matches[0].fetch(:line_pos)
+      LoggerModel.instance.log "jumping to first match:#{@position}."
+    end
+  end
+
+  def search(finished)
+    #set_jump finished
+    populate_matches 
+    if finished == true
+      jump_to_first_match
+      draw
+    else
+      draw_menu
+    end
   end
 
   def jump_to_match(forward=true)
@@ -59,12 +73,13 @@ module SearchHelper
     # go through each token and find matches
     reg_pattern = /#{Regexp.quote(search_term)}/
     
-    display_data.each_with_index do |token, index|
+    display_entries.each_with_index do |token, index|
       new_matches = token.to_enum(:scan, reg_pattern).map{Regexp.last_match}
       new_matches.each_with_index do |match, i|
         add_match({line_pos: index, match: match})
       end
     end
+    LoggerModel.instance.log "matches:#{@matches.size}"
   end
 
   def in_matches(my_matches, j)

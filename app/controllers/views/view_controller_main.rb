@@ -140,6 +140,7 @@ class ViewControllerMain
     controller = nil
     case context
     when ContextModel::CONTEXT_COURSES
+      p "going to search courses."
       controller = ViewControllerCourses.instance
     end
     controller.search(search_finished)
