@@ -49,10 +49,11 @@ class ViewControllerCourses
         break
       when KEY_K_LOWER
         @position -= 1
-        @window_offset -= 1 if(@position <= @window_offset && @window_offset != 0)
+        #@window_offset -= 1 if(@position <= @window_offset)
+        @window_offset -= 1 if(@position < @window_offset)
       when KEY_J_LOWER
         @position += 1
-        if((@position >= max_display_lines+@window_offset) && (@position+@window_offset != @courses.size))
+        if((@position >= max_display_lines+@window_offset))
           @window_offset += 1 
         end
       when KEY_N_LOWER
