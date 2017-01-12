@@ -1,0 +1,2 @@
+class CaseNextError < StandardError
+end

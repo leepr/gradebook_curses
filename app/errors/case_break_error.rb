@@ -1,0 +1,2 @@
+class CaseBreakError < StandardError
+end
