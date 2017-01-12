@@ -43,7 +43,7 @@ class ViewControllerMain
       draw
     when EVENT_CREATED_COURSE
       @context.remove_context 
-      draw
+      refresh_data
     when EVENT_ERROR
       # remove context
       @context.remove_context 
@@ -106,7 +106,7 @@ class ViewControllerMain
     @controller.close
   end
 
-  def draw
+  def get_context
     case @context.context
     when ContextModel::CONTEXT_COURSES
       @controller = ViewControllerCourses.instance
@@ -133,7 +133,18 @@ class ViewControllerMain
       @controller = ViewControllerCreateStudent.instance
       @controller.add_observer(self)
     end
-    @controller.draw
+    @controller
+  end
+
+  def refresh_data
+    controller = get_context
+    controller.refresh_data
+    controller.draw
+  end
+
+  def draw
+    controller = get_context
+    controller.draw
   end
 
   def search_context(context, search_finished=false)
