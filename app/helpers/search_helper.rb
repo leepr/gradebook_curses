@@ -26,6 +26,7 @@ module SearchHelper
     unless @matches.empty?
       set_match_index 0
       @cursor_pos_y = @matches[0].fetch(:row)
+      @cursor_pos_x = @matches[0].fetch(:col_begin)
       update_window_offset_top
     end
   end
@@ -45,7 +46,6 @@ module SearchHelper
     # forward/backward
     populate_matches
 
-    LoggerModel.instance.log "cury: #{@cursor_pos_y} curx:#{@cursor_pos_x}"
     search_mode = ContextModel.instance.search_context
     forward_offset = forward == true ? 1 : -1
     offset = search_mode == ContextModel::CONTEXT_SEARCH_FORWARD ? forward_offset : forward_offset*-1
