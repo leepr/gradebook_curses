@@ -25,7 +25,7 @@ module SearchHelper
     populate_matches
     unless @matches.empty?
       set_match_index 0
-      @position = @matches[0].fetch(:line_pos)
+      @pos_y = @matches[0].fetch(:row)
       update_window_offset_top
     end
   end
@@ -45,6 +45,7 @@ module SearchHelper
     # forward/backward
     populate_matches
 
+    LoggerModel.instance.log "cury: #{window.cury} curx:#{window.curx}"
     search_mode = ContextModel.instance.search_context
     forward_offset = forward == true ? 1 : -1
     offset = search_mode == ContextModel::CONTEXT_SEARCH_FORWARD ? forward_offset : forward_offset*-1
@@ -55,7 +56,7 @@ module SearchHelper
     new_match_index = 0 if (new_match_index == @matches.size)
     new_match_index = (@matches.size-1) if (new_match_index == -1)
     set_match_index new_match_index
-    @position = @matches[new_match_index].fetch(:line_pos)
+    @pos_y = @matches[new_match_index].fetch(:row)
     update_window_offset_top
   end
 
@@ -77,10 +78,9 @@ module SearchHelper
     display_entries.each_with_index do |token, index|
       new_matches = token.to_enum(:scan, reg_pattern).map{Regexp.last_match}
       new_matches.each_with_index do |match, i|
-        add_match({line_pos: index, match: match})
+        add_match({row: index, match: match, col_begin: match.begin(0), col_end: match.end(0)})
       end
     end
-    LoggerModel.instance.log "matches:#{@matches.size}"
   end
 
   def in_matches(my_matches, j)

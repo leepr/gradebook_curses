@@ -60,9 +60,11 @@ class ViewControllerWindowBase
   end
 
   def display_entry(index, entry_name)
+    # adding this line stops everything
+    #LoggerModel.instance.log "display entry."
     search_term = ContextModel.instance.search_term
     if search_term.nil?
-      window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
+      window.attrset(index==@pos_y ? A_STANDOUT : A_NORMAL)
       window.addstr "#{index+1}: #{entry_name}"
     else
       # highlight matching strings
@@ -70,42 +72,47 @@ class ViewControllerWindowBase
       matches = entry_name.to_enum(:scan, reg_pattern).map{Regexp.last_match}
       unless matches.empty?
         # match
-        window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
+        window.attrset(index==@pos_y ? A_STANDOUT : A_NORMAL)
         window.addstr "#{index+1}: "
         entry_name.split("").each_with_index do |letter, j|
           if in_matches(matches, j)
-            window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT))
+            if(j == window.curx)
+              # different color if cursor is at position
+              window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT_CURSOR))
+            else
+              window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT))
+            end
           else
-            window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
+            window.attrset(index==@pos_y ? A_STANDOUT : A_NORMAL)
           end
           window.addch(letter)
         end
       else
         # no match
-        window.attrset(index==@position ? A_STANDOUT : A_NORMAL)
+        window.attrset(index==@pos_y ? A_STANDOUT : A_NORMAL)
         window.addstr "#{index+1}: #{entry_name}"
       end
     end
   end
 
   def update_window_offset_top
-    # update @window_offset_top base on @position and # of display entries
+    # update @window_offset_top base on @pos_y and # of display entries
     # do nothing if everything is being shown
     return if(max_display_lines > display_entries.size)
-    # do nothing if @position is being displayed
-    return if((@position > @window_offset_top) && 
-              (@position < (@window_offset_top+max_display_lines)))
-    if(@position < @window_offset_top)
+    # do nothing if @pos_y is being displayed
+    return if((@pos_y > @window_offset_top) && 
+              (@pos_y < (@window_offset_top+max_display_lines)))
+    if(@pos_y < @window_offset_top)
       # jump screen to position
-      @window_offset_top = @position
-    elsif(@position > (@window_offset_top+max_display_lines))
+      @window_offset_top = @pos_y
+    elsif(@pos_y > (@window_offset_top+max_display_lines))
       # jump screen to show position
-      if(@position > (display_entries.size-max_display_lines))
+      if(@pos_y > (display_entries.size-max_display_lines))
         # show the last entries 
         @window_offset_top = display_entries.size-max_display_lines
       else
         # center selection in the middle of window
-        @window_offset_top = @position - (max_display_lines/2)
+        @window_offset_top = @pos_y - (max_display_lines/2)
       end
     end
   end
@@ -139,10 +146,10 @@ class ViewControllerWindowBase
         scroll_window_down
       when KEY_N_LOWER
         next if no_matches?
-        jump_to_match(true)
+        on_pressed_n_lower
       when KEY_N_UPPER
         next if no_matches?
-        jump_to_match(false)
+        on_pressed_n_upper
       when KEY_COLON
         event_object = {:event => EVENT_COLON_PRESSED}
         send_notification(event_object)
@@ -156,14 +163,15 @@ class ViewControllerWindowBase
         send_notification(event_object)
         break
       end
+      LoggerModel.instance.log "end case"
 
       # wrap
-      if @position < 0
-        @position = (display_entries.size-1)
+      if @pos_y < 0
+        @pos_y = (display_entries.size-1)
         @window_offset_top = display_entries.size - max_display_lines unless display_entries.size < max_display_lines
       end
-      if @position > (display_entries.size-1) 
-        @position = 0
+      if @pos_y > (display_entries.size-1) 
+        @pos_y = 0
         @window_offset_top = 0
       end
       draw_menu 
@@ -172,6 +180,7 @@ class ViewControllerWindowBase
 
 
   def draw_menu
+    LoggerModel.instance.log "drawing menu."
     window.clear
     display_entries.each_with_index do |entry, i|
       if(i<@window_offset_top || i>(@window_offset_top+@window.maxy+WINDOW_TOP_MARGIN))
@@ -188,13 +197,13 @@ class ViewControllerWindowBase
 
     # draw menu
     window.setpos(max_display_lines+WINDOW_BOTTOM_BUFFER, WINDOW_LEFT_MARGIN)
-    window.attrset(display_entries.size==@position ? A_STANDOUT : A_NORMAL)
+    window.attrset(display_entries.size==@pos_y ? A_STANDOUT : A_NORMAL)
     window.addstr(menu_to_s)
     window.refresh
   end
 
   def init_window
-    @position = 0
+    @pos_y = 0
     @window_offset_top = 0
   end
   
@@ -207,15 +216,15 @@ class ViewControllerWindowBase
   end
 
   def scroll_window_down
-    @position += 1
-    if((@position >= max_display_lines+@window_offset_top))
+    @pos_y += 1
+    if((@pos_y >= max_display_lines+@window_offset_top))
       @window_offset_top += 1 
     end
   end
 
   def scroll_window_up
-    @position -= 1
-    @window_offset_top -= 1 if(@position < @window_offset_top)
+    @pos_y -= 1
+    @window_offset_top -= 1 if(@pos_y < @window_offset_top)
   end
 
   def set_window(new_window)
@@ -233,15 +242,19 @@ class ViewControllerWindowBase
   end
 
   def on_pressed_k_lower
+    scroll_window_up
   end
 
   def on_pressed_j_lower
+    scroll_window_down
   end
 
   def on_pressed_n_lower
+    jump_to_match(true)
   end
 
   def on_pressed_n_upper
+    jump_to_match(false)
   end
 
 end
