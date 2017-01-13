@@ -26,6 +26,7 @@ module SearchHelper
     unless @matches.empty?
       set_match_index 0
       @position = @matches[0].fetch(:line_pos)
+      update_window_offset_top
       LoggerModel.instance.log "jumping to first match:#{@position}."
     end
   end

@@ -1,3 +1,17 @@
+# VERTICAL DIMENSIONS
+# ------------------------
+# @window_offset_top (hidden data
+# ------------------------ (Screen)
+# WINDOW_TOP_MARGIN
+# data
+# data
+# data
+# .
+# .
+# .
+#
+# WINDOW_BOTTOM_BUFFER
+# ------------------------ (End of screen)
 require './app/helpers/event_helper'
 require './app/helpers/input_helper'
 require './app/helpers/keyboard_helper'
@@ -15,7 +29,7 @@ class ViewControllerWindowBase
 
   WINDOW_BOTTOM_MARGIN = 1
   WINDOW_LEFT_MARGIN = 4
-  WINDOW_VERTICAL_OFFSET = 1
+  WINDOW_TOP_MARGIN = 1
   WINDOW_BOTTOM_BUFFER = 2
 
   def initialize
@@ -34,7 +48,6 @@ class ViewControllerWindowBase
   end
 
   def display_entries(refresh=false)
-    LoggerModel.instance.log "refreshing entries:#{refresh}"
     # collect data to search through 
     # aggregate into a list where each element represents a line
     return @display_entries if (!@display_entries.nil? && !refresh)
@@ -45,7 +58,6 @@ class ViewControllerWindowBase
     }
     @display_entries
   end
-
 
   def display_entry(index, entry_name)
     search_term = ContextModel.instance.search_term
@@ -76,59 +88,26 @@ class ViewControllerWindowBase
     end
   end
 
-  def draw_menu
-    window.clear
-    display_entries.each_with_index do |entry, i|
-      if(i<@window_offset || i>(@window_offset+@window.maxy+WINDOW_VERTICAL_OFFSET))
-        # skip if doesn't fit on screen
-        next
+  def update_window_offset_top
+    # update @window_offset_top base on @position and # of display entries
+    # do nothing if everything is being shown
+    return if(max_display_lines > display_entries.size)
+    # do nothing if @position is being displayed
+    return if((@position > @window_offset_top) && 
+              (@position < (@window_offset_top+max_display_lines)))
+    if(@position < @window_offset_top)
+      # jump screen to position
+      @window_offset_top = @position
+    elsif(@position > (@window_offset_top+max_display_lines))
+      # jump screen to show position
+      if(@position > (display_entries.size-max_display_lines))
+        # show the last entries 
+        @window_offset_top = display_entries.size-max_display_lines
+      else
+        # center selection in the middle of window
+        @window_offset_top = @position - (max_display_lines/2)
       end
-      if(i>=(@window_offset+max_display_lines))
-        # skip if beyond screen
-        next
-      end
-      window.setpos(i+WINDOW_VERTICAL_OFFSET-@window_offset, WINDOW_LEFT_MARGIN)
-      display_entry(i, entry)
     end
-
-    # draw menu
-    window.setpos(max_display_lines+WINDOW_BOTTOM_BUFFER, WINDOW_LEFT_MARGIN)
-    window.attrset(display_entries.size==@position ? A_STANDOUT : A_NORMAL)
-    window.addstr(menu_to_s)
-    window.refresh
-  end
-
-  def init_window
-    @position = 0
-    @window_offset = 0
-  end
-  
-  def max_display_lines
-    return window.maxy-WINDOW_VERTICAL_OFFSET-WINDOW_BOTTOM_BUFFER
-  end
-
-  def refresh_data
-    display_entries(true)
-  end
-
-  def scroll_window_down
-    @position += 1
-    if((@position >= max_display_lines+@window_offset))
-      @window_offset += 1 
-    end
-  end
-
-  def scroll_window_up
-    @position -= 1
-    @window_offset -= 1 if(@position < @window_offset)
-  end
-
-  def set_window(new_window)
-    @window=new_window
-  end
-
-  def window
-    @window
   end
 
   def draw
@@ -181,14 +160,70 @@ class ViewControllerWindowBase
       # wrap
       if @position < 0
         @position = (display_entries.size-1)
-        @window_offset = display_entries.size - max_display_lines unless display_entries.size < max_display_lines
+        @window_offset_top = display_entries.size - max_display_lines unless display_entries.size < max_display_lines
       end
       if @position > (display_entries.size-1) 
         @position = 0
-        @window_offset = 0
+        @window_offset_top = 0
       end
       draw_menu 
     end
+  end
+
+
+  def draw_menu
+    window.clear
+    display_entries.each_with_index do |entry, i|
+      if(i<@window_offset_top || i>(@window_offset_top+@window.maxy+WINDOW_TOP_MARGIN))
+        # skip if doesn't fit on screen
+        next
+      end
+      if(i>=(@window_offset_top+max_display_lines))
+        # skip if beyond screen
+        next
+      end
+      window.setpos(i+WINDOW_TOP_MARGIN-@window_offset_top, WINDOW_LEFT_MARGIN)
+      display_entry(i, entry)
+    end
+
+    # draw menu
+    window.setpos(max_display_lines+WINDOW_BOTTOM_BUFFER, WINDOW_LEFT_MARGIN)
+    window.attrset(display_entries.size==@position ? A_STANDOUT : A_NORMAL)
+    window.addstr(menu_to_s)
+    window.refresh
+  end
+
+  def init_window
+    @position = 0
+    @window_offset_top = 0
+  end
+  
+  def max_display_lines
+    return window.maxy-WINDOW_TOP_MARGIN-WINDOW_BOTTOM_BUFFER
+  end
+
+  def refresh_data
+    display_entries(true)
+  end
+
+  def scroll_window_down
+    @position += 1
+    if((@position >= max_display_lines+@window_offset_top))
+      @window_offset_top += 1 
+    end
+  end
+
+  def scroll_window_up
+    @position -= 1
+    @window_offset_top -= 1 if(@position < @window_offset_top)
+  end
+
+  def set_window(new_window)
+    @window=new_window
+  end
+
+  def window
+    @window
   end
 
   def on_pressed_c_lower
