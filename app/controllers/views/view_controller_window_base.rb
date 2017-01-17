@@ -206,7 +206,7 @@ class ViewControllerWindowBase
     window.addstr(menu_to_s)
 
     # set cursor position
-    window.setpos(WINDOW_TOP_MARGIN+@cursor_pos_y, 
+    window.setpos(WINDOW_TOP_MARGIN+@cursor_pos_y-@window_offset_top, 
       WINDOW_LEFT_MARGIN+@cursor_pos_x+ENTRY_INDEX_SIZE+ENTRY_INDEX_CHARS.size)
     window.refresh
   end

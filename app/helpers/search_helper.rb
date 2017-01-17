@@ -56,6 +56,8 @@ module SearchHelper
     new_match_index = 0 if (new_match_index == @matches.size)
     new_match_index = (@matches.size-1) if (new_match_index == -1)
     set_match_index new_match_index
+    # TODO - these lines work if the match is on the same screen 
+    # but breaks if we need to jump to new screen
     @cursor_pos_y = @matches[new_match_index].fetch(:row)
     @cursor_pos_x = @matches[new_match_index].fetch(:col_begin)
 
