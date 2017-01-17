@@ -1,5 +1,7 @@
 module KeyboardHelper
   KEY_COLON = ':'
+  KEY_CTRL_F = 6
+  KEY_CTRL_B = 2
   KEY_C_LOWER = 'c'
   KEY_D_LOWER = 'd'
   KEY_K_LOWER = 'k'

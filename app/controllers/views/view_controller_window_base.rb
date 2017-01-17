@@ -169,6 +169,10 @@ class ViewControllerWindowBase
         event_object = {:event => EVENT_QUESTION_MARK}
         send_notification(event_object)
         break
+      when KEY_CTRL_B
+        on_pressed_ctrl_b
+      when KEY_CTRL_F
+        on_pressed_ctrl_f
       end
 
       # wrap
@@ -225,6 +229,29 @@ class ViewControllerWindowBase
     display_entries(true)
   end
 
+  def move_cursor_page_down
+    # if cursor is at bottom then do nothing
+    return if ((max_display_lines + @window_offset_top) >= display_entries.size)
+    @window_offset_top =+ max_display_lines
+    @cursor_pos_y =+ max_display_lines
+  end
+
+  def move_cursor_page_up
+    LoggerModel.instance.log "going up."
+    # if cursor is at tope then do nothing
+    if (@window_offset_top == 0)
+      @cursor_pos_y = 0
+    elsif(@window_offset_top < max_display_lines)
+      # partial move page up
+      @window_offset_top = 0
+      @cursor_pos_y = @cursor_pos_y - max_display_lines
+      @cursor_pos_y = 0 if @cursor_pos_y < 0
+    else
+      @window_offset_top = @window_offset_top - max_display_lines
+      @cursor_pos_y = @cursor_pos_y - max_display_lines
+    end
+  end
+
   def move_cursor_down
     @cursor_pos_y += 1
     if((@cursor_pos_y >= max_display_lines+@window_offset_top))
@@ -243,6 +270,14 @@ class ViewControllerWindowBase
 
   def window
     @window
+  end
+
+  def on_pressed_ctrl_b
+    move_cursor_page_up
+  end
+
+  def on_pressed_ctrl_f
+    move_cursor_page_down
   end
 
   def on_pressed_c_lower
