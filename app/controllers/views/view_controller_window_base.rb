@@ -49,6 +49,10 @@ class ViewControllerWindowBase
     new_window
   end
 
+  def last_display_entries_pos
+    display_entries.size-1
+  end
+
   def display_entries(refresh=false)
     # collect data to search through 
     # aggregate into a list where each element represents a line
@@ -65,7 +69,7 @@ class ViewControllerWindowBase
     # adding this line stops everything
     search_term = ContextModel.instance.search_term
     if search_term.nil?
-      window.attrset(index==@cursor_pos_y ? A_STANDOUT : A_NORMAL)
+      window.attrset(index==@entry_pos_y ? A_STANDOUT : A_NORMAL)
       window.addstr "#{entry_str(index, entry_name)}"
     else
       # highlight matching strings
@@ -73,7 +77,7 @@ class ViewControllerWindowBase
       matches = entry_name.to_enum(:scan, reg_pattern).map{Regexp.last_match}
       unless matches.empty?
         # match
-        window.attrset(index==@cursor_pos_y ? A_STANDOUT : A_NORMAL)
+        window.attrset(index==@entry_pos_y ? A_STANDOUT : A_NORMAL)
         index_str = "%-#{ENTRY_INDEX_SIZE}s" % (index+1).to_s
         window.addstr("#{index_str}" + ENTRY_INDEX_CHARS)
         entry_name.split("").each_with_index do |letter, j|
@@ -85,13 +89,13 @@ class ViewControllerWindowBase
               window.attrset(color_pair(COLOR_PAIR_HIGHLIGHT))
             end
           else
-            window.attrset(index==@cursor_pos_y ? A_STANDOUT : A_NORMAL)
+            window.attrset(index==@entry_pos_y ? A_STANDOUT : A_NORMAL)
           end
           window.addch(letter)
         end
       else
         # no match
-        window.attrset(index==@cursor_pos_y ? A_STANDOUT : A_NORMAL)
+        window.attrset(index==@entry_pos_y ? A_STANDOUT : A_NORMAL)
         window.addstr "#{entry_str(index, entry_name)}"
       end
     end
@@ -103,23 +107,23 @@ class ViewControllerWindowBase
   end
 
   def update_window_offset_top
-    # update @window_offset_top base on @cursor_pos_y and # of display entries
+    # update @window_offset_top base on @entry_pos_y and # of display entries
     # do nothing if everything is being shown
     return if(max_display_lines > display_entries.size)
-    # do nothing if @cursor_pos_y is being displayed
-    return if((@cursor_pos_y > @window_offset_top) && 
-              (@cursor_pos_y < (@window_offset_top+max_display_lines)))
-    if(@cursor_pos_y < @window_offset_top)
+    # do nothing if @entry_pos_y is being displayed
+    return if((@entry_pos_y > @window_offset_top) && 
+              (@entry_pos_y < (@window_offset_top+max_display_lines)))
+    if(@entry_pos_y < @window_offset_top)
       # jump screen to position
-      @window_offset_top = @cursor_pos_y
-    elsif(@cursor_pos_y > (@window_offset_top+max_display_lines))
+      @window_offset_top = @entry_pos_y
+    elsif(@entry_pos_y > (@window_offset_top+max_display_lines))
       # jump screen to show position
-      if(@cursor_pos_y > (display_entries.size-max_display_lines))
+      if(@entry_pos_y > (display_entries.size-max_display_lines))
         # show the last entries 
         @window_offset_top = display_entries.size-max_display_lines
       else
         # center selection in the middle of window
-        @window_offset_top = @cursor_pos_y - (max_display_lines/2)
+        @window_offset_top = @entry_pos_y - (max_display_lines/2)
       end
     end
   end
@@ -176,12 +180,12 @@ class ViewControllerWindowBase
       end
 
       # wrap
-      if @cursor_pos_y < 0
-        @cursor_pos_y = (display_entries.size-1)
+      if @entry_pos_y < 0
+        @entry_pos_y = (last_display_entries_pos)
         @window_offset_top = display_entries.size - max_display_lines unless display_entries.size < max_display_lines
       end
-      if @cursor_pos_y > (display_entries.size-1) 
-        @cursor_pos_y = 0
+      if @entry_pos_y > (last_display_entries_pos) 
+        @entry_pos_y = 0
         @window_offset_top = 0
       end
       draw_menu 
@@ -206,19 +210,19 @@ class ViewControllerWindowBase
 
     # draw menu
     window.setpos(max_display_lines+WINDOW_BOTTOM_BUFFER, WINDOW_LEFT_MARGIN)
-    window.attrset(display_entries.size==@cursor_pos_y ? A_STANDOUT : A_NORMAL)
+    window.attrset(display_entries.size==@entry_pos_y ? A_STANDOUT : A_NORMAL)
     window.addstr(menu_to_s)
 
     # set cursor position
     # verify cursor pos
-    window.setpos(WINDOW_TOP_MARGIN+@cursor_pos_y-@window_offset_top, 
-      WINDOW_LEFT_MARGIN+@cursor_pos_x+ENTRY_INDEX_SIZE+ENTRY_INDEX_CHARS.size)
+    window.setpos(WINDOW_TOP_MARGIN+@entry_pos_y-@window_offset_top, 
+      WINDOW_LEFT_MARGIN+@entry_pos_x+ENTRY_INDEX_SIZE+ENTRY_INDEX_CHARS.size)
     window.refresh
   end
 
   def init_window
-    @cursor_pos_y = 0
-    @cursor_pos_x = 0
+    @entry_pos_y = 0
+    @entry_pos_x = 0
     @window_offset_top = 0
   end
   
@@ -228,60 +232,66 @@ class ViewControllerWindowBase
 
   def refresh_data
     display_entries(true)
+    validate_offset_top
     validate_cursor_pos
+  end
+
+  def validate_offset_top
+    # after CRUD make sure that data is still selected
+    move_cursor_page_up if(@window_offset_top > last_display_entries_pos)
   end
 
   def validate_cursor_pos
     # verifies that cursor pos is okay after CRUD data
-    @cursor_pos_y = display_entries.size-1 if(@cursor_pos_y >= display_entries.size-1) 
+    @entry_pos_y = last_display_entries_pos if(@entry_pos_y >= last_display_entries_pos) 
   end
 
   def move_cursor_page_down
     # if cursor is at bottom then do nothing
-    return if @cursor_pos_y == display_entries.size
+    return if @entry_pos_y == display_entries.size
 
     if ((max_display_lines + @window_offset_top) >= display_entries.size)
       # if cursor is at bottom then only move cursor
-      #@cursor_pos_y = display_entries.size - @window_offset_top
-      @cursor_pos_y = display_entries.size-1
+      #@entry_pos_y = display_entries.size - @window_offset_top
+      @entry_pos_y = last_display_entries_pos
     elsif ((display_entries.size-@window_offset_top) < max_display_lines)
       # partial move page down
       move_diff = (@window_offset_top + max_display_lines) - display_entries.size
-      @cursor_pos_y =+ move_diff
+      @entry_pos_y =+ move_diff
       @window_offset_top =+ move_diff
     else
       move_diff = @window_offset_top+max_display_lines > display_entries.size ?
         (display_entries.size - (max_display_lines + @window_offset_top)) : max_display_lines
       @window_offset_top =+ move_diff
-      @cursor_pos_y =+ move_diff
+      @entry_pos_y =+ move_diff
     end
   end
 
   def move_cursor_page_up
     # if cursor is at top then do nothing
     if (@window_offset_top == 0)
-      @cursor_pos_y = 0
+      @entry_pos_y = 0
     elsif(@window_offset_top < max_display_lines)
       # partial move page up
       @window_offset_top = 0
-      @cursor_pos_y = @cursor_pos_y - max_display_lines
-      @cursor_pos_y = 0 if @cursor_pos_y < 0
+      @entry_pos_y = @entry_pos_y - max_display_lines
+      @entry_pos_y = 0 if @entry_pos_y < 0
     else
       @window_offset_top = @window_offset_top - max_display_lines
-      @cursor_pos_y = @cursor_pos_y - max_display_lines
+      @entry_pos_y = @entry_pos_y - max_display_lines
     end
   end
 
   def move_cursor_down
-    @cursor_pos_y += 1
-    if((@cursor_pos_y >= max_display_lines+@window_offset_top))
+    @entry_pos_y += 1
+    if((@entry_pos_y >= max_display_lines+@window_offset_top))
       @window_offset_top += 1 
     end
   end
 
   def move_cursor_up
-    @cursor_pos_y -= 1
-    @window_offset_top -= 1 if(@cursor_pos_y < @window_offset_top)
+    @entry_pos_y -= 1
+    @window_offset_top -= 1 if(@entry_pos_y < @window_offset_top)
   end
 
   def set_window(new_window)

@@ -25,8 +25,8 @@ module SearchHelper
     populate_matches
     unless @matches.empty?
       set_match_index 0
-      @cursor_pos_y = @matches[0].fetch(:row)
-      @cursor_pos_x = @matches[0].fetch(:col_begin)
+      @entry_pos_y = @matches[0].fetch(:row)
+      @entry_pos_x = @matches[0].fetch(:col_begin)
       update_window_offset_top
     end
   end
@@ -58,8 +58,8 @@ module SearchHelper
     set_match_index new_match_index
     # TODO - these lines work if the match is on the same screen 
     # but breaks if we need to jump to new screen
-    @cursor_pos_y = @matches[new_match_index].fetch(:row)
-    @cursor_pos_x = @matches[new_match_index].fetch(:col_begin)
+    @entry_pos_y = @matches[new_match_index].fetch(:row)
+    @entry_pos_x = @matches[new_match_index].fetch(:col_begin)
 
     update_window_offset_top
   end

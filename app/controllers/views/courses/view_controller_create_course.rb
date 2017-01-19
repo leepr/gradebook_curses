@@ -95,10 +95,8 @@ class ViewControllerCreateCourse
           @window.setpos(@window.cury, @window.curx+1)
           @window.refresh
         end
-      when KEY_D_LOWER
-        @window.delch
-        @window.refresh
       else
+        LoggerModel.instance.log "key:#{input}"
         # append input to current input
         @window.addstr("#{input}")
         @window.refresh
