@@ -210,6 +210,7 @@ class ViewControllerWindowBase
     window.addstr(menu_to_s)
 
     # set cursor position
+    # verify cursor pos
     window.setpos(WINDOW_TOP_MARGIN+@cursor_pos_y-@window_offset_top, 
       WINDOW_LEFT_MARGIN+@cursor_pos_x+ENTRY_INDEX_SIZE+ENTRY_INDEX_CHARS.size)
     window.refresh
@@ -227,18 +228,37 @@ class ViewControllerWindowBase
 
   def refresh_data
     display_entries(true)
+    validate_cursor_pos
+  end
+
+  def validate_cursor_pos
+    # verifies that cursor pos is okay after CRUD data
+    @cursor_pos_y = display_entries.size-1 if(@cursor_pos_y >= display_entries.size-1) 
   end
 
   def move_cursor_page_down
     # if cursor is at bottom then do nothing
-    return if ((max_display_lines + @window_offset_top) >= display_entries.size)
-    @window_offset_top =+ max_display_lines
-    @cursor_pos_y =+ max_display_lines
+    return if @cursor_pos_y == display_entries.size
+
+    if ((max_display_lines + @window_offset_top) >= display_entries.size)
+      # if cursor is at bottom then only move cursor
+      #@cursor_pos_y = display_entries.size - @window_offset_top
+      @cursor_pos_y = display_entries.size-1
+    elsif ((display_entries.size-@window_offset_top) < max_display_lines)
+      # partial move page down
+      move_diff = (@window_offset_top + max_display_lines) - display_entries.size
+      @cursor_pos_y =+ move_diff
+      @window_offset_top =+ move_diff
+    else
+      move_diff = @window_offset_top+max_display_lines > display_entries.size ?
+        (display_entries.size - (max_display_lines + @window_offset_top)) : max_display_lines
+      @window_offset_top =+ move_diff
+      @cursor_pos_y =+ move_diff
+    end
   end
 
   def move_cursor_page_up
-    LoggerModel.instance.log "going up."
-    # if cursor is at tope then do nothing
+    # if cursor is at top then do nothing
     if (@window_offset_top == 0)
       @cursor_pos_y = 0
     elsif(@window_offset_top < max_display_lines)

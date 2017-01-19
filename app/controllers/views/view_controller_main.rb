@@ -40,7 +40,7 @@ class ViewControllerMain
       draw
     when EVENT_DELETED_COURSE
       @context.remove_context 
-      draw
+      refresh_data
     when EVENT_CREATED_COURSE
       @context.remove_context 
       refresh_data
@@ -151,7 +151,6 @@ class ViewControllerMain
     controller = nil
     case context
     when ContextModel::CONTEXT_COURSES
-      p "going to search courses."
       controller = ViewControllerCourses.instance
     end
     controller.search(search_finished)

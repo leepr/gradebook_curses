@@ -20,7 +20,7 @@ class ViewControllerCourses < ViewControllerWindowBase
 
   def on_pressed_d_lower
     event_object = {:event => EVENT_DELETE_COURSE,
-      :course_index => @position
+      :course_index => @cursor_pos_y
     }
     send_notification(event_object)
     raise CaseBreakError
