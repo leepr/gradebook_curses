@@ -31,6 +31,17 @@ module SearchHelper
     end
   end
 
+  def jump_to_line line
+    if (line > last_display_entries_pos)
+      # show error
+    else
+      @entry_pos_y = line
+      @entry_pos_x = 0
+      update_window_offset_top
+    end
+    draw
+  end
+
   def search(finished)
     #set_jump finished
     populate_matches 

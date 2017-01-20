@@ -116,9 +116,9 @@ class ViewControllerWindowBase
     if(@entry_pos_y < @window_offset_top)
       # jump screen to position
       @window_offset_top = @entry_pos_y
-    elsif(@entry_pos_y > (@window_offset_top+max_display_lines))
+    elsif(@entry_pos_y >= (@window_offset_top+max_display_lines))
       # jump screen to show position
-      if(@entry_pos_y > (display_entries.size-max_display_lines))
+      if(@entry_pos_y >= (display_entries.size-max_display_lines))
         # show the last entries 
         @window_offset_top = display_entries.size-max_display_lines
       else
@@ -226,6 +226,10 @@ class ViewControllerWindowBase
     @window_offset_top = 0
   end
   
+  def jump_to_line_number line_num
+    jump_to_line line_num
+  end
+
   def max_display_lines
     return window.maxy-WINDOW_TOP_MARGIN-WINDOW_BOTTOM_BUFFER
   end

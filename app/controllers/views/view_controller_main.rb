@@ -62,6 +62,9 @@ class ViewControllerMain
       @context.add_context ContextModel::CONTEXT_SEARCH_FORWARD
       @context.search_context = ContextModel::CONTEXT_SEARCH_FORWARD
       draw
+    when EVENT_JUMP_TO_LINE_NUMBER
+      @context.remove_context 
+      jump_to_line(@context.context, event_obj[:line_num])
     when EVENT_QUESTION_MARK
       @context.add_context ContextModel::CONTEXT_SEARCH_BACKWARD
       @context.search_context = ContextModel::CONTEXT_SEARCH_BACKWARD
@@ -74,7 +77,6 @@ class ViewControllerMain
     when EVENT_SEARCH_FINISHED
       @context.search_term=event_obj[:term]
       @context.remove_context 
-      #draw
       search_context(@context.context, true)
     when EVENT_SEARCH_INCREMENT
       @context.search_term=event_obj[:term]
@@ -106,8 +108,8 @@ class ViewControllerMain
     @controller.close
   end
 
-  def get_context
-    case @context.context
+  def get_controller context
+    case context
     when ContextModel::CONTEXT_COURSES
       @controller = ViewControllerCourses.instance
       @controller.add_observer(self)
@@ -137,22 +139,23 @@ class ViewControllerMain
   end
 
   def refresh_data
-    controller = get_context
+    controller = get_controller @context.context
     controller.refresh_data
     controller.draw
   end
 
   def draw
-    controller = get_context
+    controller = get_controller @context.context
     controller.draw
   end
 
   def search_context(context, search_finished=false)
-    controller = nil
-    case context
-    when ContextModel::CONTEXT_COURSES
-      controller = ViewControllerCourses.instance
-    end
+    controller = get_controller context
     controller.search(search_finished)
+  end
+
+  def jump_to_line(context, line_number)
+    controller = get_controller context
+    controller.jump_to_line(line_number)
   end
 end

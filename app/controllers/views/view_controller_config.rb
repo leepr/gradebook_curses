@@ -59,14 +59,24 @@ class ViewControllerConfig
           send_notification(event_object)
           break
         else
-          # TODO: add cases for valid commands in this case block
           # input not valid, show error and close window
-          close
-          event_object = {
-            :event => EVENT_ERROR,
-            :message => "\'#{c_input}\' is not a valid command."
-          }
-          send_notification(event_object)
+          # if number then jump to line
+          if c_input =~ /^\d+$/
+            line_num = c_input.to_i
+            close
+            event_object = {
+              :event => EVENT_JUMP_TO_LINE_NUMBER,
+              :line_num => line_num-1
+            }
+            send_notification(event_object)
+          else
+            close
+            event_object = {
+              :event => EVENT_ERROR,
+              :message => "\'#{c_input}\' is not a valid command."
+            }
+            send_notification(event_object)
+          end
           break
         end
       when KEY_ESCAPE

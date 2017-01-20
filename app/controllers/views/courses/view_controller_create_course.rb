@@ -96,7 +96,6 @@ class ViewControllerCreateCourse
           @window.refresh
         end
       else
-        LoggerModel.instance.log "key:#{input}"
         # append input to current input
         @window.addstr("#{input}")
         @window.refresh

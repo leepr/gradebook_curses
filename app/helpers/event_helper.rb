@@ -9,6 +9,7 @@ module EventHelper
   EVENT_ESCAPE = :event_escape
   EVENT_FINISHED_DISPLAYING_STATUS = :event_finished_displaying_status
   EVENT_FORWARD_SLASH = :event_forward_slash
+  EVENT_JUMP_TO_LINE_NUMBER = :event_jump_to_line_number
   EVENT_QUESTION_MARK = :event_question_mark
   EVENT_QUIT = :event_quit
   EVENT_SEARCH_FINISHED = :event_search_finished
