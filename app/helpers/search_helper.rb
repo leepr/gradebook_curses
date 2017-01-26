@@ -34,6 +34,11 @@ module SearchHelper
   def jump_to_line line
     if (line > last_display_entries_pos)
       # show error
+      event_object = {
+        :event => EventHelper::EVENT_ERROR,
+        :message => "Line number #{line} does not exist."
+      }
+      send_notification(event_object)
     else
       @entry_pos_y = line
       @entry_pos_x = 0
