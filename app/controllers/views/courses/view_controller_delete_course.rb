@@ -48,13 +48,10 @@ class ViewControllerDeleteCourse
     while(input = @window.getch)
       case input
       when "Y"
-        # delete course
         close
 
-        CoursesModel.instance.delete_course ContextModel.instance.course_index
-
         event_object = {
-          :event => EVENT_DELETED_COURSE
+          :event => EVENT_CONFIRM_DELETE_COURSE
         }
         send_notification(event_object)
         break

@@ -16,6 +16,10 @@ class CoursesModel
     @courses = []
   end
 
+  def get_course index
+    @courses[index]
+  end
+
   def add_course course_name
     @courses << create_course_object(course_name)
     save_data

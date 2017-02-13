@@ -1,112 +1,39 @@
 require 'byebug'
 require 'singleton'
-require './app/helpers/context_helper'
-require './app/models/context_primary_model'
-require './app/models/context_secondary_model'
 Dir['./app/controllers/views/*.rb'].each{|file| require file}
 Dir['./app/controllers/views/courses/*.rb'].each{|file| require file}
 Dir['./app/controllers/views/students/*.rb'].each{|file| require file}
+require './app/helpers/input_helper'
+require './app/helpers/event_helper'
+#require './app/models/context_model'
+require './app/models/courses_model'
 
-class ViewControllerMain
+class ViewControllerPrimary
   include Singleton
   include EventHelper
   include InputHelper
 
+=begin
+  alias_method :pc, :primary_context
+
+  def initialize
+    # main window
+    @primary_context = ContextModel.new
+  end
+
+  def primary_context
+    @primary_context
+  end
+
+  def secondary_context
+    @secondary_context
+  end
+
   def init
     setup_input
-
-    # main window
-    @primary_context = ContextPrimaryModel.instance
-    @primary_context.add_observer self
-
-    # footer 
-    @secondary_context = ContextSecondaryModel.instance
-    @secondary_context.add_observer self
+    draw
   end
 
-  def draw_primary
-    controller = get_controller pc.context
-    controller.draw
-  end
-
-  def draw_secondary
-    controller = get_controller sc.context
-    controller.draw
-  end
-
-  def remove_secondary context_removed
-    controller = get_controller context_removed
-    controller.close
-  end
-
-  def refresh_data
-    controller = get_controller pc.context
-    controller.refresh_data
-    controller.draw
-  end
-
-  def get_controller context
-    case context
-    when ContextHelper::CONTEXT_COURSES
-      controller = ViewControllerCourses.instance
-      controller.add_observer(self)
-    when ContextHelper::CONTEXT_COURSE_CREATE
-      controller = ViewControllerCreateCourse.instance
-      controller.add_observer(self)
-    when ContextHelper::CONTEXT_COURSE_DELETE
-      controller = ViewControllerDeleteCourse.instance
-      controller.add_observer(self)
-    when ContextHelper::CONTEXT_CONFIG
-      controller = ViewControllerConfig.instance
-      controller.add_observer(self)
-    when ContextHelper::CONTEXT_ERROR
-      controller = ViewControllerError.instance
-      controller.add_observer(self)
-    when ContextHelper::CONTEXT_SEARCH_FORWARD, ContextHelper::CONTEXT_SEARCH_BACKWARD
-      controller = ViewControllerSearch.instance
-      controller.add_observer(self)
-    when ContextHelper::CONTEXT_STUDENTS
-      controller = ViewControllerStudents.instance
-      controller.add_observer(self)
-    when ContextHelper::CONTEXT_STUDENT_CREATE
-      controller = ViewControllerCreateStudent.instance
-      controller.add_observer(self)
-    end
-    controller
-  end
-
-  def update(event_obj)
-    case event_obj[:event] 
-    when EVENT_DELETE_COURSE
-      sc.course_index = event_obj[:course_index]
-      sc.add_context ContextHelper::CONTEXT_COURSE_DELETE
-      draw_secondary
-    when EVENT_CONFIRM_DELETE_COURSE
-      # remove delete course context
-      @context.remove_context 
-      refresh_data
-    when EVENT_CONTEXT_ADDED
-      context = event_obj[:context]
-      case context
-      when ContextHelper::CONTEXT_DELETE
-        draw_secondary
-      when ContextHelper::CONTEXT_MESSAGE
-        draw_secondary
-      end
-    when EVENT_CONTEXT_REMOVED 
-      context = event_obj[:context]
-      case context
-      when ContextHelper::CONTEXT_DELETE
-        LoggerModel.instance.log("remove config")
-        remove_secondary
-      when ContextHelper::CONTEXT_MESSAGE
-        LoggerModel.instance.log("remove message")
-        remove_secondary
-      end
-    end
-  end
-
-=begin
   def draw_menu_window
     @menu_controller = ViewControllerMenu.new @window
   end
@@ -193,6 +120,42 @@ class ViewControllerMain
     controller.close
   end
 
+  def get_controller context
+    case context
+    when ContextHelper::CONTEXT_COURSES
+      controller = ViewControllerCourses.instance
+      controller.add_observer(self)
+    when ContextHelper::CONTEXT_CREATE_COURSE
+      controller = ViewControllerCreateCourse.instance
+      controller.add_observer(self)
+    when ContextHelper::CONTEXT_DELETE_COURSE
+      controller = ViewControllerDeleteCourse.instance
+      controller.add_observer(self)
+    when ContextHelper::CONTEXT_CONFIG
+      controller = ViewControllerConfig.instance
+      controller.add_observer(self)
+    when ContextHelper::CONTEXT_ERROR
+      controller = ViewControllerError.instance
+      controller.add_observer(self)
+    when ContextHelper::CONTEXT_SEARCH_FORWARD, ContextHelper::CONTEXT_SEARCH_BACKWARD
+      controller = ViewControllerSearch.instance
+      controller.add_observer(self)
+    when ContextHelper::CONTEXT_STUDENTS
+      controller = ViewControllerStudents.instance
+      controller.add_observer(self)
+    when ContextHelper::CONTEXT_STUDENT_CREATE
+      controller = ViewControllerCreateStudent.instance
+      controller.add_observer(self)
+    end
+    controller
+  end
+
+  def refresh_data
+    controller = get_controller @context.context
+    controller.refresh_data
+    controller.draw
+  end
+
   def draw
     controller = get_controller pc.context
     controller.draw
@@ -208,16 +171,4 @@ class ViewControllerMain
     controller.jump_to_line(line_number)
   end
 =end
-  private
-  def primary_context
-    @primary_context
-  end
-
-  def secondary_context
-    @secondary_context
-  end
-
-  alias_method :pc, :primary_context
-  alias_method :sc, :secondary_context
-
 end

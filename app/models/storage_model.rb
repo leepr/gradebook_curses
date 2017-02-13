@@ -1,4 +1,5 @@
 require 'singleton'
+require 'observer'
 require 'json'
 require './app/helpers/event_helper'
 require './app/models/logger_model'
@@ -7,6 +8,7 @@ require './app/models/students_model'
 
 class StorageModel
   include Singleton
+  include Observable
   include EventHelper
   attr_reader :data
 

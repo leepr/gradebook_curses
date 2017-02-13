@@ -2,7 +2,7 @@ require 'observer'
 require 'singleton'
 require './app/helpers/event_helper'
 require './app/helpers/input_helper'
-require './app/models/context_model'
+#require './app/models/context_model'
 
 class ViewControllerError
   include InputHelper

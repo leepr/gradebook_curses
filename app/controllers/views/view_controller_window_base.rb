@@ -67,7 +67,7 @@ class ViewControllerWindowBase
 
   def display_entry(index, entry_name)
     # adding this line stops everything
-    search_term = ContextModel.instance.search_term
+    search_term = ContextPrimaryModel.instance.search_term
     if search_term.nil?
       window.attrset(index==@entry_pos_y ? A_STANDOUT : A_NORMAL)
       window.addstr "#{entry_str(index, entry_name)}"
